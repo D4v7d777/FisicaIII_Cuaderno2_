@@ -1503,7 +1503,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
    NOTEBOOK FULL-VIEWPORT (No Scroll, Adaptive)
    ══════════════════════════════════════════════════ */
 .notebook-view {
-  display: flex;
+  display: none; /* controlled by .view-panel.active */
   flex-direction: column;
   height: 100%;
   overflow: hidden;
