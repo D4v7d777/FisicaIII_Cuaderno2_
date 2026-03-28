@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulación: Ondas Armónicas</title>
+  <style>
+    /* =========================================================
+       1. SISTEMA DE TEMAS (CSS CUSTOM PROPERTIES)
+       ========================================================= */
+    :root {
+      --bg-primary: #0E0E10;
+      --bg-secondary: #16161A;
+      --bg-tertiary: #1E1E24;
+      --text-primary: #F5F5F0;
+      --text-secondary: #A0A0B0;
+      --accent: #00E5FF;
+      --accent-secondary: #B100E8;
+      --accent-glow: rgba(0, 229, 255, 0.4);
+      --shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+      --border-color: rgba(0, 229, 255, 0.3);
+      --animation-speed: 2s;
+      --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+      --particle-color: #00E5FF;
+      --overlay-color: rgba(14, 14, 16, 0.7);
+      
+      --var-A: var(--accent);
+      --var-K: #4ade80;
+      --var-W: #fbbf24;
+      --var-P: #f43f5e;
+    }
+
+    :root[data-theme="light"] {
+      --bg-primary: #FAFAF8;
+      --bg-secondary: #F0F0EE;
+      --bg-tertiary: #E5E5E2;
+      --text-primary: #1A1A1A;
+      --text-secondary: #5C5C66;
+      --accent: #0B4A99;
+      --accent-secondary: #E63946;
+      --accent-glow: rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --border-color: rgba(0, 0, 0, 0.1);
+      --animation-speed: 4s;
+      --animation-easing: ease-in-out;
+      --particle-color: #0B4A99;
+      --overlay-color: rgba(250, 250, 248, 0.85);
+      
+      --var-A: var(--accent);
+      --var-K: #16a34a;
+      --var-W: #d97706;
+      --var-P: #e11d48;
+    }
+
+    :root[data-theme="dark"] {
+      --bg-primary: #0E0E10;
+      --bg-secondary: #1C1C22;
+      --bg-tertiary: #272730;
+      --text-primary: #F4F4F8;
+      --text-secondary: #8E8EA0;
+      --accent: #00E5FF;
+      --accent-secondary: #FF2A6D;
+      --accent-glow: rgba(0, 229, 255, 0.6);
+      --shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+      --border-color: rgba(0, 229, 255, 0.25);
+      --animation-speed: 1.5s;
+      --animation-easing: ease-in-out;
+      --particle-color: #00E5FF;
+      --overlay-color: rgba(14, 14, 16, 0.8);
+      
+      --var-A: var(--accent);
+      --var-K: #39FF14;
+      --var-W: #FFD700;
+      --var-P: #FF007F;
+    }
+
+    :root[data-theme="forest"] {
+      --bg-primary: #1B2D1A;
+      --bg-secondary: #243B22;
+      --bg-tertiary: #314D2E;
+      --text-primary: #F5EDD6;
+      --text-secondary: #A8C09A;
+      --accent: #7FD44C;
+      --accent-secondary: #F9A03F;
+      --accent-glow: rgba(127, 212, 76, 0.2);
+      --shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      --border-color: rgba(127, 212, 76, 0.2);
+      --animation-speed: 5s;
+      --animation-easing: ease-in-out;
+      --particle-color: #7FD44C;
+      --overlay-color: rgba(27, 45, 26, 0.75);
+      
+      --var-A: var(--accent);
+      --var-K: #A3E635;
+      --var-W: #FBBF24;
+      --var-P: #F43F5E;
+    }
+
+    :root[data-theme="sunset"] {
+      --bg-primary: linear-gradient(135deg, #FF6B35 0%, #F7C59F 50%, #6B2D8B 100%);
+      --bg-secondary: rgba(25, 10, 30, 0.5);
+      --bg-tertiary: rgba(0, 0, 0, 0.3);
+      --text-primary: #FFF0D6;
+      --text-secondary: #FFB380;
+      --accent: #FFF;
+      --accent-secondary: #FFD166;
+      --accent-glow: rgba(255, 255, 255, 0.5);
+      --shadow: 0 10px 25px rgba(107, 45, 139, 0.5);
+      --border-color: rgba(255, 255, 255, 0.15);
+      --animation-speed: 6s;
+      --animation-easing: ease-in-out;
+      --particle-color: #FFFFFF;
+      --overlay-color: rgba(107, 45, 139, 0.6);
+      
+      --var-A: var(--accent);
+      --var-K: #FFD166;
+      --var-W: #FF9F1C;
+      --var-P: #EF476F;
+    }
+
+    :root[data-theme="ocean"] {
+      --bg-primary: #0A1628;
+      --bg-secondary: #112B47;
+      --bg-tertiary: #19436A;
+      --text-primary: #E0F2FE;
+      --text-secondary: #7DD3FC;
+      --accent: #06B6D4;
+      --accent-secondary: #3B82F6;
+      --accent-glow: rgba(6, 182, 212, 0.4);
+      --shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+      --border-color: rgba(6, 182, 212, 0.3);
+      --animation-speed: 3.5s;
+      --animation-easing: ease-in-out;
+      --particle-color: #38BDF8;
+      --overlay-color: rgba(10, 22, 40, 0.7);
+
+      --var-A: var(--accent);
+      --var-K: #67E8F9;
+      --var-W: #93C5FD;
+      --var-P: #C4B5FD;
+    }
+
+    :root[data-theme="neon"] {
+      --bg-primary: #000000;
+      --bg-secondary: #0A0A0A;
+      --bg-tertiary: #141414;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B3B3B3;
+      --accent: #FF00FF;
+      --accent-secondary: #39FF14;
+      --accent-glow: rgba(255, 0, 255, 0.8);
+      --shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 30px var(--accent);
+      --border-color: var(--accent);
+      --animation-speed: 0.8s;
+      --animation-easing: steps(2);
+      --particle-color: #FFFF00;
+      --overlay-color: rgba(0, 0, 0, 0.9);
+
+      --var-A: var(--accent);
+      --var-K: #39FF14;
+      --var-W: #FFFF00;
+      --var-P: #FF073A;
+    }
+
+    :root[data-theme="aurora"] {
+      --bg-primary: linear-gradient(-45deg, #020111, #20124d, #000022, #113333);
+      --bg-secondary: rgba(0, 0, 0, 0.4);
+      --bg-tertiary: rgba(0, 0, 0, 0.6);
+      --text-primary: #E8FFFB;
+      --text-secondary: #90E0D0;
+      --accent: #00FFAA;
+      --accent-secondary: #9D00FF;
+      --accent-glow: rgba(0, 255, 170, 0.6);
+      --shadow: 0 0 20px rgba(0, 255, 170, 0.3), inset 0 0 30px rgba(157, 0, 255, 0.1);
+      --border-color: rgba(0, 255, 170, 0.4);
+      --animation-speed: 8s;
+      --animation-easing: ease-in-out;
+      --particle-color: #00FFAA;
+      --overlay-color: rgba(2, 1, 17, 0.5);
+
+      --var-A: var(--accent);
+      --var-K: #9D00FF;
+      --var-W: #00E5FF;
+      --var-P: #FF00AA;
+    }
+
+    /* =========================================================
+       2. ESTILOS GLOBALES E INTERFAZ
+       ========================================================= */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.8s ease, color 0.8s ease, box-shadow 0.8s ease, border-color 0.8s ease, text-shadow 0.8s ease;
+    }
+
+    body {
+      background: var(--bg-primary);
+      background-size: 400% 400%;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    :root[data-theme="sunset"] body, :root[data-theme="aurora"] body {
+      animation: gradientShift var(--animation-speed) ease infinite;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+      z-index: 10;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr 340px; /* Canvas izquierda, Controles derecha */
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .app-container { grid-template-columns: 1fr; }
+    }
+
+    /* Caja de Ecuación Matemático / UI Elements */
+    .glass-panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 25px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all 0.8s ease;
+      position: relative;
+    }
+    :root[data-theme="forest"] .glass-panel { backdrop-filter: blur(4px); }
+    :root[data-theme="ocean"] .glass-panel { backdrop-filter: blur(25px); border-radius: 30px;}
+    :root[data-theme="neon"] h1 {
+      text-shadow: 0 0 5px var(--accent-secondary), 0 0 10px var(--accent-secondary);
+      animation: flicker var(--animation-speed) infinite alternate;
+    }
+    :root[data-theme="neon"] .glass-panel {
+      box-shadow: 0 0 15px var(--accent), inset 0 0 10px var(--accent);
+      border: 2px solid var(--accent);
+      border-radius: 0;
+    }
+    
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+      20%, 24%, 55% { opacity: 0.5; }
+    }
+
+    /* =========================================================
+       3. ECUACIÓN Y CONTROLES (MATH TYPOGRAPHY)
+       ========================================================= */
+    .math-formula {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.05);
+      letter-spacing: 1px;
+    }
+    :root[data-theme="neon"] .math-formula { border-radius: 0; border: 1px solid var(--accent); }
+    
+    .math-formula span { font-weight: bold; transition: color 0.3s; text-shadow: 0 0 8px currentColor; }
+    .color-a { color: var(--var-A); }
+    .color-k { color: var(--var-K); }
+    .color-w { color: var(--var-W); }
+    .color-p { color: var(--var-P); }
+
+    /* Canvas Cartesiano Estilizado */
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      background: var(--bg-primary); /* Fondo interior = primario para contrastar malla */
+      border-radius: 15px;
+      overflow: hidden;
+      border: 2px solid var(--border-color);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+    }
+    :root[data-theme="neon"] .canvas-wrapper { border-radius: 0; border: 2px solid var(--accent); }
+    :root[data-theme="light"] .canvas-wrapper { background: #FFFFFF; } /* Más claro aún en tema light */
+    
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .scanlines {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+      background-size: 100% 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    :root[data-theme="neon"] .scanlines { opacity: 1; }
+
+    /* Controles Laterales */
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+    
+    .control-block {
+      background: var(--bg-tertiary);
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+      position: relative;
+      border-left: 5px solid; /* Acentuado dinámicamente */
+    }
+    :root[data-theme="neon"] .control-block { border-radius: 0; }
+    
+    #block-a { border-left-color: var(--var-A); }
+    #block-k { border-left-color: var(--var-K); }
+    #block-w { border-left-color: var(--var-W); }
+    #block-p { border-left-color: var(--var-P); }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .control-desc {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .math-sym {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: var(--bg-primary);
+      border-radius: 3px;
+      border: 1px solid var(--border-color);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      box-shadow: var(--shadow);
+      border: 2px solid var(--bg-primary);
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -8px;
+      transition: transform 0.1s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    :root[data-theme="neon"] input[type=range]::-webkit-slider-thumb { border-radius: 0; border: 1px solid var(--text-primary); }
+    :root[data-theme="neon"] input[type=range]::-webkit-slider-runnable-track { border-radius: 0; }
+
+    /* Thumb colors overridden par variable */
+    #slider-a::-webkit-slider-thumb { background: var(--var-A); }
+    #slider-k::-webkit-slider-thumb { background: var(--var-K); }
+    #slider-w::-webkit-slider-thumb { background: var(--var-W); }
+    #slider-p::-webkit-slider-thumb { background: var(--var-P); }
+    
+    .fps-container {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    #slider-fps::-webkit-slider-thumb { background: var(--text-primary); }
+
+    /* Dirección de la onda */
+    .toggle-dir {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .dir-btn {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 6px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    :root[data-theme="neon"] .dir-btn { border-radius: 0; }
+    .dir-btn.active {
+      background: var(--accent);
+      color: var(--bg-primary);
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+    
+    /* Selector Temas UI Flotante */
+    .theme-selector-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 15px;
+    }
+
+    .theme-selector-toggle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      font-size: 1.5rem;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    :root[data-theme="neon"] .theme-selector-toggle { border-radius: 0; background: #000; }
+    .theme-selector-toggle:hover {
+      transform: scale(1.1) rotate(15deg);
+      background: var(--accent);
+      color: var(--bg-primary);
+    }
+
+    .theme-list {
+      display: flex;
+      flex-direction: column-reverse; /* Hacia arriba */
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px) scale(0.9);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: var(--bg-secondary);
+      padding: 12px;
+      border-radius: 30px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+    }
+    :root[data-theme="neon"] .theme-list { border-radius: 0; }
+    
+    .theme-selector-container:hover .theme-list,
+    .theme-list.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0) scale(1);
+    }
+
+    .theme-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-primary);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    :root[data-theme="neon"] .theme-btn { border-radius: 0; }
+    .theme-btn:hover { transform: scale(1.2); }
+    .theme-btn.active-theme::after {
+      content: '';
+      position: absolute;
+      top: -4px; right: -4px; bottom: -4px; left: -4px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+    }
+    :root[data-theme="neon"] .theme-btn.active-theme::after { border-radius: 0; }
+
+    /* Tooltip */
+    .theme-btn::before {
+      content: attr(data-name);
+      position: absolute;
+      right: 55px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .theme-btn:hover::before { opacity: 1; }
+
+    /* Colores estáticos visuales de botones */
+    .btn-light { background: #FAFAF8; }
+    .btn-dark { background: #0E0E10; }
+    .btn-forest { background: #1B2D1A; }
+    .btn-sunset { background: linear-gradient(135deg, #FF6B35, #6B2D8B); }
+    .btn-ocean { background: #0A1628; }
+    .btn-neon { background: #000; border-color: #FF00FF !important; }
+    .btn-aurora { background: linear-gradient(-45deg, #20124d, #113333); }
+    
+  </style>
+</head>
+<body>
+
+  <!-- Selector Flotante de Temas -->
+  <div class="theme-selector-container" id="themeContainer">
+    <div class="theme-list" id="themeList">
+      <button class="theme-btn btn-aurora" data-theme-val="aurora" data-name="Aurora"></button>
+      <button class="theme-btn btn-neon" data-theme-val="neon" data-name="Neon"></button>
+      <button class="theme-btn btn-ocean" data-theme-val="ocean" data-name="Ocean"></button>
+      <button class="theme-btn btn-sunset" data-theme-val="sunset" data-name="Sunset"></button>
+      <button class="theme-btn btn-forest" data-theme-val="forest" data-name="Forest"></button>
+      <button class="theme-btn btn-dark" data-theme-val="dark" data-name="Dark"></button>
+      <button class="theme-btn btn-light" data-theme-val="light" data-name="Light"></button>
+    </div>
+    <div class="theme-selector-toggle" id="themeToggle">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        <circle cx="12" cy="12" r="5"/>
+      </svg>
+    </div>
+  </div>
+
+  <header>
+    <h1>Ondas Armónicas Viajeras</h1>
+    <h2>Representación Matemática en el Plano Cartesiano</h2>
+  </header>
+
+  <div class="app-container">
+    
+    <!-- Lado Izquierdo: Modelo Matemático y Visual -->
+    <div class="left-panel">
+      <!-- Ecuación Interactiva -->
+      <div class="glass-panel math-formula">
+        $y(x,t) = 
+        <span class="color-a" id="math-A">100</span> \sin\Big(
+        <span class="color-k" id="math-K">0.05</span> x
+        <span id="math-Sign">-</span>
+        <span class="color-w" id="math-W">2.0</span> t + 
+        <span class="color-p" id="math-P">0</span>\Big)$
+      </div>
+
+      <!-- Canvas -->
+      <div class="canvas-wrapper">
+        <div class="scanlines"></div>
+        <canvas id="waveCanvas"></canvas>
+      </div>
+      
+      <!-- Controles de Simulación (Footer) -->
+      <div class="fps-container">
+        <span>FPS Dinámico (Velocidad de Simulación): </span>
+        <input type="range" id="slider-fps" min="0" max="100" value="30" style="max-width:200px">
+        <span id="val-fps" style="font-weight:bold;">1.0x</span>
+      </div>
+    </div>
+
+    <!-- Lado Derecho: Controles Físicos -->
+    <div class="glass-panel controls-panel">
+      
+      <div class="control-block" id="block-a">
+        <div class="control-header">
+          <span><span class="math-sym color-a">A</span> - Amplitud</span>
+          <span id="val-A">100 px</span>
+        </div>
+        <input type="range" id="slider-a" min="10" max="250" value="100">
+        <div class="control-desc">Altura máxima de la cresta (y_max)</div>
+      </div>
+
+      <div class="control-block" id="block-k">
+        <div class="control-header">
+          <span><span class="math-sym color-k">k</span> - Número de Onda</span>
+          <span id="val-K">0.05 rad/px</span>
+        </div>
+        <input type="range" id="slider-k" min="10" max="150" value="50">
+        <div class="control-desc">Repeticiones en el espacio. $k = 2\pi / \lambda$ <br><span style="color:#A0A0B0" id="val-Lambda">λ = 125.6 px</span></div>
+      </div>
+
+      <div class="control-block" id="block-w">
+        <div class="control-header">
+          <span><span class="math-sym color-w">&omega;</span> - Frecuencia Ang.</span>
+          <span id="val-W">2.0 rad/s</span>
+        </div>
+        <input type="range" id="slider-w" min="1" max="100" value="20">
+        <div class="control-desc">Velocidad angular. $v = \omega / k$<br><span style="color:#A0A0B0" id="val-Vel">v = 40.0 px/s</span></div>
+      </div>
+
+      <div class="control-block" id="block-p">
+        <div class="control-header">
+          <span><span class="math-sym color-p">&phi;</span> - Fase Inicial</span>
+          <span id="val-P">0 rad</span>
+        </div>
+        <input type="range" id="slider-p" min="0" max="314" value="0">
+        <div class="control-desc">Desplazamiento inicial respecto al origen.</div>
+      </div>
+
+      <div class="toggle-dir">
+        <button class="dir-btn active" id="btn-right" data-dir="-">Viaja (+x)</button>
+        <button class="dir-btn" id="btn-left" data-dir="+">Viaja (-x)</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    /* =========================================================
+       1. MANEJO DE TEMAS (CSS Custom Properties)
+       ========================================================= */
+    const rootEl = document.documentElement;
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    let currentTheme = localStorage.getItem('app-theme') || 'dark';
+
+    function applyTheme(themeName) {
+      if(!themeName) return;
+      rootEl.setAttribute('data-theme', themeName);
+      themeBtns.forEach(btn => {
+        if(btn.dataset.themeVal === themeName && themeName === currentTheme) {
+          btn.classList.add('active-theme');
+        } else {
+          btn.classList.remove('active-theme');
+        }
+      });
+    }
+
+    applyTheme(currentTheme);
+    themeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const theme = e.target.dataset.themeVal;
+        currentTheme = theme;
+        localStorage.setItem('app-theme', theme);
+        applyTheme(theme);
+      });
+      btn.addEventListener('mouseenter', (e) => rootEl.setAttribute('data-theme', e.target.dataset.themeVal));
+      btn.addEventListener('mouseleave', () => applyTheme(currentTheme));
+    });
+    document.getElementById('themeToggle').addEventListener('click', () => document.getElementById('themeList').classList.toggle('active'));
+
+    /* =========================================================
+       2. MOTOR SIMULADOR CARTESIANO (CANVAS 2D)
+       ========================================================= */
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Estado de la Simulación
+    let params = {
+      A: 100,             // Amplitud original
+      k: 0.05,            // Número de onda escalado
+      w: 2.0,             // Frec. angular 
+      p: 0,               // Fase inicial
+      sign: -1,           // -1: a la derecha, 1: a la izquierda
+      fps: 1.0,           // Multiplicador de velocidad de tiempo
+      t: 0                // Tiempo continuo
+    };
+
+    // UI Elements a actualizar
+    const mathA = document.getElementById('math-A');
+    const mathK = document.getElementById('math-K');
+    const mathW = document.getElementById('math-W');
+    const mathP = document.getElementById('math-P');
+    const mathSign = document.getElementById('math-Sign');
+
+    const valA = document.getElementById('val-A');
+    const valK = document.getElementById('val-K');
+    const valW = document.getElementById('val-W');
+    const valP = document.getElementById('val-P');
+    const valFps = document.getElementById('val-fps');
+    const valLambda = document.getElementById('val-Lambda');
+    const valVel = document.getElementById('val-Vel');
+
+    // Sliders
+    const sA = document.getElementById('slider-a');
+    const sK = document.getElementById('slider-k');
+    const sW = document.getElementById('slider-w');
+    const sP = document.getElementById('slider-p');
+    const sFPS = document.getElementById('slider-fps');
+
+    const btnRight = document.getElementById('btn-right');
+    const btnLeft = document.getElementById('btn-left');
+
+    // Adaptación Retina/HDPI
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Sincronización de UI con lógica
+    function updateDerived() {
+      // k original mapeado: / 1000
+      let realK = sK.value / 1000;
+      let lambda = (2 * Math.PI) / realK;
+      
+      // w original mapeado / 10
+      let realW = sW.value / 10;
+      let vel = realW / realK;
+
+      let realP = sP.value / 100;
+
+      params.A = parseInt(sA.value);
+      params.k = realK;
+      params.w = realW;
+      params.p = realP;
+      
+      // Update DOM
+      mathA.textContent = params.A;
+      mathK.textContent = params.k.toFixed(3);
+      mathW.textContent = params.w.toFixed(1);
+      mathP.textContent = params.p.toFixed(2);
+      mathSign.textContent = params.sign === -1 ? '-' : '+';
+
+      valA.textContent = `${params.A} px`;
+      valK.textContent = `${params.k.toFixed(3)} rad/px`;
+      valW.textContent = `${params.w.toFixed(1)} rad/s`;
+      valP.textContent = `${params.p.toFixed(2)} rad`;
+      
+      valLambda.textContent = `λ = ${lambda.toFixed(1)} px`;
+      valVel.textContent = `v = ${vel.toFixed(1)} px/s`;
+    }
+
+    sA.addEventListener('input', updateDerived);
+    sK.addEventListener('input', updateDerived);
+    sW.addEventListener('input', updateDerived);
+    sP.addEventListener('input', updateDerived);
+    sFPS.addEventListener('input', (e) => {
+      let v = e.target.value / 30; // 30 es slider val 30 => 1.0x
+      params.fps = v;
+      valFps.textContent = `${v.toFixed(1)}x`;
+    });
+
+    btnRight.addEventListener('click', () => { 
+      params.sign = -1; btnRight.classList.add('active'); btnLeft.classList.remove('active'); updateDerived(); 
+    });
+    btnLeft.addEventListener('click', () => { 
+      params.sign = 1; btnLeft.classList.add('active'); btnRight.classList.remove('active'); updateDerived(); 
+    });
+
+    // Iniciar con valores por defecto
+    updateDerived();
+
+    // Paleta CSS
+    function getThemeColors() {
+      const s = getComputedStyle(document.body);
+      return {
+        bg: s.getPropertyValue('--bg-primary').trim(),
+        text: s.getPropertyValue('--text-primary').trim(),
+        textSec: s.getPropertyValue('--text-secondary').trim(),
+        border: s.getPropertyValue('--border-color').trim(),
+        accent: s.getPropertyValue('--accent').trim(),
+        accentSec: s.getPropertyValue('--accent-secondary').trim(),
+        colorA: s.getPropertyValue('--var-A').trim(),
+        colorP: s.getPropertyValue('--var-P').trim()
+      };
+    }
+
+    // Dibujo Principal
+    function render() {
+      const w = parseInt(canvas.style.width);
+      const h = parseInt(canvas.style.height);
+      const cx = w / 2;
+      const cy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+      const c = getThemeColors();
+
+      // 1. DIBUJAR MALLA CARTESIANA FIJA (-500 a 500, ej)
+      ctx.lineWidth = 1;
+      
+      // Cuadrícula Secundaria (cada 50px)
+      ctx.strokeStyle = c.textSec;
+      ctx.globalAlpha = 0.15;
+      ctx.beginPath();
+      // Lineas verticales
+      for(let x=0; x<=w; x+=50) {
+        let offsetX = (cx % 50) + (x - (cx % 50)); 
+        ctx.moveTo(offsetX, 0); ctx.lineTo(offsetX, h);
+      }
+      // Lineas horizontales
+      for(let y=0; y<=h; y+=50) {
+        let offsetY = (cy % 50) + (y - (cy % 50));
+        ctx.moveTo(0, offsetY); ctx.lineTo(w, offsetY);
+      }
+      ctx.stroke();
+
+      // Ejes Principales X e Y
+      ctx.globalAlpha = 0.8;
+      ctx.strokeStyle = c.text;
+      ctx.beginPath();
+      ctx.moveTo(0, cy); ctx.lineTo(w, cy); // X
+      ctx.moveTo(cx, 0); ctx.lineTo(cx, h); // Y
+      ctx.stroke();
+
+      // Rótulos de coordenadas
+      ctx.fillStyle = c.textSec;
+      ctx.font = "12px monospace";
+      ctx.globalAlpha = 0.6;
+      for(let i=-10; i<=10; i++) {
+        if(i === 0) continue;
+        let pX = cx + i*50;
+        let pY = cy - i*50;
+        // Textos del Eje X
+        if(pX > 0 && pX < w) ctx.fillText(i*50, pX + 5, cy + 15);
+        // Textos del Eje Y
+        if(pY > 0 && pY < h) ctx.fillText(i*50, cx + 5, pY - 5);
+      }
+      ctx.globalAlpha = 1.0;
+
+      // 2. ACTUALIZAR TIEMPO
+      let realThemeSpeed = parseFloat(getComputedStyle(document.body).getPropertyValue('--animation-speed')) || 2;
+      // Normalizar para que dt base sea suave
+      let dt = params.fps * (60 / realThemeSpeed) * 0.005; // dt adaptativo
+      params.t += dt;
+
+      // 3. DIBUJAR LA ONDA ARMÓNICA y(x,t) = A * sin(k*x -+ w*t + p)
+      if(currentTheme === 'neon' || currentTheme === 'dark' || currentTheme === 'aurora') {
+         ctx.shadowBlur = 15;
+         ctx.shadowColor = c.accentSec;
+      } else {
+         ctx.shadowBlur = 0;
+      }
+
+      ctx.beginPath();
+      ctx.strokeStyle = c.accent; // Línea gruesa
+      ctx.lineWidth = 3;
+      
+      let first = true;
+      for(let px = 0; px <= w; px++) {
+        let x_math = px - cx; // x matemático centrado
+        // Ecuación
+        let y_math = params.A * Math.sin(params.k * x_math + params.sign * params.w * params.t + params.p);
+        let py = cy - y_math;
+        
+        if(first) { ctx.moveTo(px, py); first = false; }
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      
+      // Efectos extra: Partícula osciladora en X = 0 (Eje Y)
+      let y0_math = params.A * Math.sin(params.k * 0 + params.sign * params.w * params.t + params.p);
+      let py0 = cy - y0_math;
+      
+      // Dibujar línea guía roja tenue al eje Y
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy); ctx.lineTo(cx, py0);
+      ctx.strokeStyle = c.colorP; // Color rosado/rojo fase
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Dibujar bola oscilante
+      if(currentTheme === 'neon') {
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = c.colorP;
+      }
+      ctx.beginPath();
+      ctx.arc(cx, py0, 8, 0, Math.PI*2);
+      ctx.fillStyle = c.colorP;
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      requestAnimationFrame(render);
+    }
+
+    render();
+  </script>
+</body>
+</html>

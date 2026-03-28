@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulación: Ondas Transversales y Longitudinales</title>
+  <style>
+    /* =========================================================
+       1. SISTEMA DE TEMAS (CSS CUSTOM PROPERTIES)
+       ========================================================= */
+
+    /* DEFAULT (Fallback a oscuro interactivo antes de montar JS) */
+    :root {
+      --bg-primary: #0E0E10;
+      --bg-secondary: #16161A;
+      --bg-tertiary: #1E1E24;
+      --text-primary: #F5F5F0;
+      --text-secondary: #A0A0B0;
+      --accent: #00E5FF;
+      --accent-secondary: #B100E8;
+      --accent-glow: rgba(0, 229, 255, 0.4);
+      --shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+      --border-color: rgba(0, 229, 255, 0.3);
+      --animation-speed: 2s;
+      --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+      --particle-color: #00E5FF;
+      --overlay-color: rgba(14, 14, 16, 0.7);
+    }
+
+    /* 1. Theme: Light (Claro diurno) */
+    :root[data-theme="light"] {
+      --bg-primary: #FAFAF8;
+      --bg-secondary: #F0F0EE;
+      --bg-tertiary: #E5E5E2;
+      --text-primary: #1A1A1A;
+      --text-secondary: #5C5C66;
+      --accent: #0B4A99;
+      --accent-secondary: #4285F4;
+      --accent-glow: rgba(0, 0, 0, 0.05); /* Sin brillo, solo sombra suave */
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra difusa */
+      --border-color: rgba(0, 0, 0, 0.1);
+      --animation-speed: 4s; /* Lentas tipo respiración */
+      --animation-easing: ease-in-out;
+      --particle-color: #0B4A99;
+      --overlay-color: rgba(250, 250, 248, 0.85);
+    }
+
+    /* 2. Theme: Dark (Oscuro nocturno) */
+    :root[data-theme="dark"] {
+      --bg-primary: #0E0E10;
+      --bg-secondary: #1C1C22;
+      --bg-tertiary: #272730;
+      --text-primary: #F4F4F8;
+      --text-secondary: #8E8EA0;
+      --accent: #00E5FF; /* Cyan eléctrico */
+      --accent-secondary: #D900FF; /* Violeta neón */
+      --accent-glow: rgba(0, 229, 255, 0.6);
+      --shadow: 0 0 20px rgba(0, 229, 255, 0.3); /* Glows de color */
+      --border-color: rgba(0, 229, 255, 0.25);
+      --animation-speed: 1.5s; /* Rápidas, brillo y pulso */
+      --animation-easing: ease-in-out;
+      --particle-color: #00E5FF;
+      --overlay-color: rgba(14, 14, 16, 0.8);
+    }
+
+    /* 3. Theme: Forest (Naturaleza) */
+    :root[data-theme="forest"] {
+      --bg-primary: #1B2D1A;
+      --bg-secondary: #243B22;
+      --bg-tertiary: #314D2E;
+      --text-primary: #F5EDD6; /* Marfil cálido */
+      --text-secondary: #A8C09A;
+      --accent: #7FD44C; /* Verde lima */
+      --accent-secondary: #D4B84C; /* Dorado vegetal */
+      --accent-glow: rgba(127, 212, 76, 0.2);
+      --shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      --border-color: rgba(127, 212, 76, 0.2);
+      --animation-speed: 5s; /* Lentas, hojas en viento */
+      --animation-easing: ease-in-out;
+      --particle-color: #7FD44C;
+      --overlay-color: rgba(27, 45, 26, 0.75);
+    }
+
+    /* 4. Theme: Sunset (Atardecer) */
+    :root[data-theme="sunset"] {
+      --bg-primary: linear-gradient(135deg, #FF6B35 0%, #F7C59F 50%, #6B2D8B 100%);
+      --bg-secondary: rgba(25, 10, 30, 0.5); /* Semi trans back */
+      --bg-tertiary: rgba(0, 0, 0, 0.3);
+      --text-primary: #FFF0D6;
+      --text-secondary: #FFB380;
+      --accent: #FF356B; /* Magenta coral */
+      --accent-secondary: #FFB347;
+      --accent-glow: rgba(255, 53, 107, 0.5);
+      --shadow: 0 10px 25px rgba(107, 45, 139, 0.5);
+      --border-color: rgba(255, 255, 255, 0.15);
+      --animation-speed: 6s; /* Olas de calor lentas */
+      --animation-easing: ease-in-out;
+      --particle-color: #FFFFFF;
+      --overlay-color: rgba(107, 45, 139, 0.6);
+    }
+
+    /* 5. Theme: Ocean (Acuático) */
+    :root[data-theme="ocean"] {
+      --bg-primary: #0A1628;
+      --bg-secondary: #112B47;
+      --bg-tertiary: #19436A;
+      --text-primary: #E0F2FE; /* Blanco azulado */
+      --text-secondary: #7DD3FC;
+      --accent: #06B6D4; /* Turquesa */
+      --accent-secondary: #2DD4BF; /* Aguamarina */
+      --accent-glow: rgba(6, 182, 212, 0.4);
+      --shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+      --border-color: rgba(6, 182, 212, 0.3);
+      --animation-speed: 3.5s; /* Ondulantes */
+      --animation-easing: ease-in-out;
+      --particle-color: #38BDF8;
+      --overlay-color: rgba(10, 22, 40, 0.7);
+    }
+
+    /* 6. Theme: Neon (Cyberpunk) */
+    :root[data-theme="neon"] {
+      --bg-primary: #000000;
+      --bg-secondary: #0A0A0A;
+      --bg-tertiary: #141414;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B3B3B3;
+      --accent: #FF00FF; /* Rosa neón */
+      --accent-secondary: #39FF14; /* Verde neón */
+      --accent-glow: rgba(255, 0, 255, 0.8);
+      --shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 40px var(--accent); /* Intensidad */
+      --border-color: var(--accent);
+      --animation-speed: 0.8s; /* Velocidad alta, Glitch */
+      --animation-easing: steps(2);
+      --particle-color: #FFFF00; /* Amarillo eléctrico */
+      --overlay-color: rgba(0, 0, 0, 0.9);
+    }
+
+    /* Bonus Theme: Aurora */
+    :root[data-theme="aurora"] {
+      --bg-primary: linear-gradient(-45deg, #020111, #20124d, #000022, #113333);
+      --bg-secondary: rgba(0, 0, 0, 0.4);
+      --bg-tertiary: rgba(0, 0, 0, 0.6);
+      --text-primary: #E8FFFB;
+      --text-secondary: #90E0D0;
+      --accent: #00FFAA;
+      --accent-secondary: #9D00FF;
+      --accent-glow: rgba(0, 255, 170, 0.6);
+      --shadow: 0 0 20px rgba(0, 255, 170, 0.3), inset 0 0 30px rgba(157, 0, 255, 0.1);
+      --border-color: rgba(0, 255, 170, 0.4);
+      --animation-speed: 8s; /* Auroras MUY lentas */
+      --animation-easing: ease-in-out;
+      --particle-color: #00FFAA;
+      --overlay-color: rgba(2, 1, 17, 0.5);
+    }
+
+    /* =========================================================
+       2. ESTILOS GLOBALES E INTERFAZ
+       ========================================================= */
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      /* Transición SUAVE obligatoria para todas las variables en :root o body */
+      transition: background 0.8s ease, color 0.8s ease, box-shadow 0.8s ease, border-color 0.8s ease, text-shadow 0.8s ease;
+    }
+
+    body {
+      background: var(--bg-primary);
+      background-size: 400% 400%; /* Preparado para fondos animados (sunset, aurora) */
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    /* Animación genérica de fondo para temas que usan gradiente (Sunset, Aurora) */
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    :root[data-theme="sunset"] body, :root[data-theme="aurora"] body {
+      animation: gradientShift var(--animation-speed) ease infinite;
+    }
+
+    /* Títulos y Header */
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+      z-index: 10;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      transition: color 0.8s ease;
+    }
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+
+    /* Contenedor Principal Glassmorphism / UI Elements */
+    .app-container {
+      width: 100%;
+      max-width: 1000px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 25px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all 0.8s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Efectos Especiales reactivos al Tema en los paneles */
+    :root[data-theme="forest"] .app-container { backdrop-filter: blur(4px); }
+    :root[data-theme="ocean"] .app-container { backdrop-filter: blur(25px); border-radius: 30px;}
+    :root[data-theme="neon"] h1 {
+      text-shadow: 0 0 5px var(--accent-secondary), 0 0 10px var(--accent-secondary);
+      animation: flicker var(--animation-speed) infinite alternate;
+    }
+    :root[data-theme="neon"] .app-container {
+      box-shadow: 0 0 15px var(--accent), inset 0 0 10px var(--accent);
+      border: 2px solid var(--accent);
+      border-radius: 0;
+    }
+
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+      20%, 24%, 55% { opacity: 0.5; }
+    }
+
+    /* Canvas Contenedor */
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      margin-top: 15px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(255,255,255,0.05); /* Soft inner border */
+      overflow: hidden;
+      transition: all 0.8s ease;
+    }
+    :root[data-theme="neon"] .canvas-wrapper { border-radius: 0; border: 1px solid var(--accent-secondary); }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Efectos del canvas (Scanlines en neon) */
+    .scanlines {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+      background-size: 100% 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    :root[data-theme="neon"] .scanlines { opacity: 1; }
+
+    /* Controles Superiores (Botones de tipo de onda) */
+    .controls-top {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+      background: var(--bg-tertiary);
+      padding: 12px;
+      border-radius: 8px;
+    }
+    :root[data-theme="neon"] .controls-top { border-radius: 0; border: 1px solid var(--accent); }
+
+    label.radio-btn {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 0.95rem;
+      user-select: none;
+      transition: color 0.3s;
+    }
+    label.radio-btn input { display: none; }
+    .radio-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--text-secondary);
+      display: inline-block;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    :root[data-theme="neon"] .radio-circle { border-radius: 0; }
+    
+    label.radio-btn input:checked + .radio-circle {
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+    label.radio-btn input:checked + .radio-circle::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      transition: background 0.3s;
+    }
+    :root[data-theme="neon"] label.radio-btn input:checked + .radio-circle::after { border-radius: 0; }
+    label.radio-btn:hover { color: var(--accent); }
+
+    /* Controles Inferiores (Sliders físicos) */
+    .controls-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-tertiary);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+    }
+    :root[data-theme="neon"] .controls-bottom { border-radius: 0; }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex: 1;
+      min-width: 200px;
+    }
+    .slider-label {
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.1rem;
+      width: 40px;
+      text-shadow: 0 0 2px rgba(0,0,0,0.1);
+    }
+    
+    /* Input Range Estilizado globalmente usando custom properties */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: var(--bg-primary);
+      border-radius: 3px;
+      border: 1px solid var(--border-color);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      box-shadow: var(--shadow);
+      border: 2px solid var(--bg-primary);
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -8px;
+      transition: transform 0.1s, background 0.5s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    :root[data-theme="neon"] input[type=range]::-webkit-slider-thumb { border-radius: 0; border: 1px solid var(--text-primary); }
+    :root[data-theme="neon"] input[type=range]::-webkit-slider-runnable-track { border-radius: 0; }
+
+    .slider-value {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      min-width: 50px;
+      text-align: center;
+      font-family: monospace;
+      border: 1px solid var(--border-color);
+    }
+    :root[data-theme="neon"] .slider-value { border-radius: 0; }
+
+    /* =========================================================
+       3. SELECTOR LOCALIZADOR DE TEMAS (UI FLOATING FLOTANTE)
+       ========================================================= */
+
+    .theme-selector-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 15px;
+    }
+
+    .theme-selector-toggle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      font-size: 1.5rem;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    :root[data-theme="neon"] .theme-selector-toggle { border-radius: 0; background: #000; }
+    .theme-selector-toggle:hover {
+      transform: scale(1.1) rotate(15deg);
+      background: var(--accent);
+      color: var(--bg-primary);
+    }
+
+    .theme-list {
+      display: flex;
+      flex-direction: column-reverse; /* Hacia arriba */
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px) scale(0.9);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: var(--bg-secondary);
+      padding: 12px;
+      border-radius: 30px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+    }
+    :root[data-theme="neon"] .theme-list { border-radius: 0; }
+    
+    .theme-selector-container:hover .theme-list,
+    .theme-list.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0) scale(1);
+    }
+
+    .theme-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-primary);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    :root[data-theme="neon"] .theme-btn { border-radius: 0; }
+    .theme-btn:hover { transform: scale(1.2); }
+    .theme-btn.active-theme::after {
+      content: '';
+      position: absolute;
+      top: -4px; right: -4px; bottom: -4px; left: -4px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+    }
+    :root[data-theme="neon"] .theme-btn.active-theme::after { border-radius: 0; }
+
+    /* Tooltip */
+    .theme-btn::before {
+      content: attr(data-name);
+      position: absolute;
+      right: 55px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .theme-btn:hover::before { opacity: 1; }
+
+    /* Colores hardcodeados SOLO para los botones selectores */
+    .btn-light { background: #FAFAF8; }
+    .btn-dark { background: #0E0E10; }
+    .btn-forest { background: #1B2D1A; }
+    .btn-sunset { background: linear-gradient(135deg, #FF6B35, #6B2D8B); }
+    .btn-ocean { background: #0A1628; }
+    .btn-neon { background: #000; border-color: #FF00FF !important; }
+    .btn-aurora { background: linear-gradient(-45deg, #20124d, #113333); }
+
+    /* Info flotante */
+    .legend {
+      position: absolute;
+      top: 15px; left: 15px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      pointer-events: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    :root[data-theme="neon"] .legend { border-radius: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- Selector Flotante de Temas -->
+  <div class="theme-selector-container" id="themeContainer">
+    <div class="theme-list" id="themeList">
+      <!-- Los temas se añaden dinámicamente o estáticos. Aquí estáticos para control de orden -->
+      <button class="theme-btn btn-aurora" data-theme-val="aurora" data-name="Aurora"></button>
+      <button class="theme-btn btn-neon" data-theme-val="neon" data-name="Neon"></button>
+      <button class="theme-btn btn-ocean" data-theme-val="ocean" data-name="Ocean"></button>
+      <button class="theme-btn btn-sunset" data-theme-val="sunset" data-name="Sunset"></button>
+      <button class="theme-btn btn-forest" data-theme-val="forest" data-name="Forest"></button>
+      <button class="theme-btn btn-dark" data-theme-val="dark" data-name="Dark"></button>
+      <button class="theme-btn btn-light" data-theme-val="light" data-name="Light"></button>
+    </div>
+    <div class="theme-selector-toggle" id="themeToggle">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        <circle cx="12" cy="12" r="5"/>
+      </svg>
+    </div>
+  </div>
+
+  <header>
+    <h1>Laboratorio de Ondas</h1>
+    <h2>Representación Transversal y Longitudinal</h2>
+  </header>
+
+  <div class="app-container">
+    
+    <!-- Controles Superiores: Modo de Onda -->
+    <div class="controls-top">
+      <label class="radio-btn">
+        <input type="radio" name="waveMode" value="transverse" checked>
+        <span class="radio-circle"></span>
+        Onda Transversal
+      </label>
+      <label class="radio-btn">
+        <input type="radio" name="waveMode" value="longitudinal">
+        <span class="radio-circle"></span>
+        Onda Longitudinal
+      </label>
+    </div>
+
+    <!-- Canvas Principal -->
+    <div class="canvas-wrapper">
+      <div class="legend" id="simLegend">Modo: Transversal</div>
+      <div class="scanlines"></div> <!-- Para tema Neon -->
+      <canvas id="waveCanvas"></canvas>
+    </div>
+
+    <!-- Controles Inferiores: Parámetros -->
+    <div class="controls-bottom">
+      <div class="slider-group">
+        <span class="slider-label"><i>A</i></span>
+        <input type="range" id="ampSlider" min="10" max="150" value="80">
+        <span class="slider-value" id="ampVal">80</span>
+      </div>
+      <div class="slider-group">
+        <span class="slider-label"><i>&lambda;</i></span>
+        <input type="range" id="lambdaSlider" min="50" max="400" value="200">
+        <span class="slider-value" id="lambdaVal">200</span>
+      </div>
+      <div class="slider-group">
+        <span class="slider-label"><i>f</i></span>
+        <input type="range" id="freqSlider" min="1" max="50" value="10">
+        <span class="slider-value" id="freqVal">0.01</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       1. GESTIÓN DEL SISTEMA DE TEMAS
+       ========================================================= */
+    const rootEl = document.documentElement;
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    let currentTheme = localStorage.getItem('app-theme') || 'dark'; // Tema por defecto
+    let temporaryTheme = null; // Para preview en hover
+
+    function applyTheme(themeName) {
+      if(!themeName) return;
+      rootEl.setAttribute('data-theme', themeName);
+      
+      // Actualizar UI
+      themeBtns.forEach(btn => {
+        if(btn.dataset.themeVal === themeName && themeName === currentTheme) {
+          btn.classList.add('active-theme');
+        } else {
+          btn.classList.remove('active-theme');
+        }
+      });
+    }
+
+    // Inicializar Tema
+    applyTheme(currentTheme);
+
+    // Lógica Intersiva UI Temas
+    themeBtns.forEach(btn => {
+      // Aplicación definitiva al dar Clic
+      btn.addEventListener('click', (e) => {
+        const theme = e.target.dataset.themeVal;
+        currentTheme = theme;
+        localStorage.setItem('app-theme', theme);
+        temporaryTheme = null; // Reset
+        applyTheme(theme);
+      });
+
+      // Preview al pasar el ratón (Hover)
+      btn.addEventListener('mouseenter', (e) => {
+        const hoverTheme = e.target.dataset.themeVal;
+        rootEl.setAttribute('data-theme', hoverTheme);
+        // Marcamos temporalmente (sin guardar en LocalStorage ni afectar el botón activo)
+      });
+
+      // Volver a la normalidad al retirar ratón (Mouseout)
+      btn.addEventListener('mouseleave', () => {
+        applyTheme(currentTheme);
+      });
+    });
+
+    // Menú toggle en móvil (opcional pero ayuda interacciones)
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      document.getElementById('themeList').classList.toggle('active');
+    });
+
+    /* =========================================================
+       2. LÓGICA DE SIMULACIÓN Y MOTOR CANVAS
+       ========================================================= */
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // UI Elements
+    const radios = document.getElementsByName('waveMode');
+    const ampSlider = document.getElementById('ampSlider');
+    const lambdaSlider = document.getElementById('lambdaSlider');
+    const freqSlider = document.getElementById('freqSlider');
+    const simLegend = document.getElementById('simLegend');
+
+    // Values Elements
+    const ampVal = document.getElementById('ampVal');
+    const lambdaVal = document.getElementById('lambdaVal');
+    const freqVal = document.getElementById('freqVal');
+
+    // Estado físico
+    let params = {
+      mode: 'transverse', // transverse | longitudinal
+      A: parseInt(ampSlider.value), // Amplitud gráfica
+      lambda: parseInt(lambdaSlider.value), // Longitud de onda en pixels
+      f: parseInt(freqSlider.value) / 1000, // Frecuencia escalada gráficamente
+      t: 0 // Tiempo contínuo
+    };
+
+    // Ajuste de canvas a la resolución real (Anti-aliasing)
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      // Para Retinas
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Listeners Controles
+    radios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        params.mode = e.target.value;
+        simLegend.textContent = `Modo: ${params.mode === 'transverse' ? 'Transversal' : 'Longitudinal'}`;
+      });
+    });
+
+    ampSlider.addEventListener('input', (e) => {
+      params.A = parseInt(e.target.value);
+      ampVal.textContent = params.A;
+    });
+    lambdaSlider.addEventListener('input', (e) => {
+      params.lambda = parseInt(e.target.value);
+      lambdaVal.textContent = params.lambda;
+    });
+    freqSlider.addEventListener('input', (e) => {
+      params.f = parseInt(e.target.value) / 1000;
+      freqVal.textContent = (parseInt(e.target.value) / 1000).toFixed(3);
+    });
+
+    // Obtener variables dinámicas de :root CSS 
+    // Magia que vincula JS y el sistema de Custom Properties de CSS en tiempo real
+    function getThemeColors() {
+      const computedStyle = getComputedStyle(document.body);
+      return {
+        accent: computedStyle.getPropertyValue('--accent').trim(),
+        accentSecondary: computedStyle.getPropertyValue('--accent-secondary').trim(),
+        particle: computedStyle.getPropertyValue('--particle-color').trim(),
+        bgPrimary: computedStyle.getPropertyValue('--bg-primary').trim(),
+        textPrimary: computedStyle.getPropertyValue('--text-primary').trim(),
+        textSecondary: computedStyle.getPropertyValue('--text-secondary').trim(),
+      };
+    }
+
+    // Dibujo Cuadrícula
+    function drawGrid(w, h, colors) {
+      const stepX = 50;
+      const stepY = 50;
+      
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += stepX) {
+        ctx.moveTo(x, 0); ctx.lineTo(x, h);
+      }
+      for (let y = 0; y <= h; y += stepY) {
+        ctx.moveTo(0, y); ctx.lineTo(w, y);
+      }
+      ctx.strokeStyle = colors.textSecondary;
+      ctx.globalAlpha = 0.15; // Opacidad muy baja
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+
+      // Eje Central Y
+      ctx.beginPath();
+      ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+      ctx.strokeStyle = colors.textPrimary;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+    }
+
+    // Dibujar Onda Transversal
+    function drawTransverse(w, h, colors) {
+      const k = (2 * Math.PI) / params.lambda; // Número de onda
+      const omega = 2 * Math.PI * params.f;    // Frecuencia angular real en la simulación
+      
+      // Efectos reactivos: Brillo basado en Tema activo (neon / dark)
+      if(currentTheme === 'neon' || currentTheme === 'aurora' || currentTheme === 'dark') {
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = colors.accent;
+      } else {
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 1) {
+        // y(x,t) = A * sin(kx - omega*t)
+        const y = h/2 + params.A * Math.sin(k * x - omega * params.t);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = colors.accentSecondary;
+      ctx.stroke();
+
+      // Dibujar Nodos/Masa (Puntos como en la imagen de referencia)
+      ctx.fillStyle = colors.particle;
+      const points = 20; // 20 partículas equiespaciadas simulando osciladores puros (aproximación)
+      for (let i = 0; i <= points; i++) {
+        let x = (w / points) * i;
+        const y = h/2 + params.A * Math.sin(k * x - omega * params.t);
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = colors.bgPrimary; // Borde oscuro
+        ctx.stroke();
+      }
+      ctx.shadowBlur = 0; // Reset
+    }
+
+    // Dibujar Onda Longitudinal
+    function drawLongitudinal(w, h, colors) {
+       const k = (2 * Math.PI) / params.lambda;
+       const omega = 2 * Math.PI * params.f;
+       
+       const pointsPerRow = 50;
+       const numRows = 7;
+       const rowSpacing = 30;
+       const startY = h/2 - ((numRows-1)*rowSpacing)/2;
+
+       if(currentTheme === 'neon') {
+         ctx.shadowBlur = 10;
+         ctx.shadowColor = colors.particle;
+       } else {
+         ctx.shadowBlur = 0;
+       }
+
+       for(let r = 0; r < numRows; r++) {
+         let baseY = startY + r * rowSpacing;
+         
+         for(let i = 0; i <= pointsPerRow; i++) {
+           let baseX = (w / pointsPerRow) * i;
+           // En longitudinal la variación / amplitud impacta el eje X en vez del Y.
+           const dispX = params.A * Math.sin(k * baseX - omega * params.t);
+           let finalX = baseX + dispX;
+           let finalY = baseY;
+
+           ctx.beginPath();
+           ctx.arc(finalX, finalY, 4, 0, Math.PI * 2);
+           ctx.fillStyle = colors.particle;
+           ctx.fill();
+         }
+       }
+       ctx.shadowBlur = 0;
+    }
+
+    // Loop
+    function render() {
+      // Limpiar Canvas
+      // Obtenemos clientWidth/Height porque usamos un scale de dpr, usar esto mantiene la precisión matemática.
+      const w = parseInt(canvas.style.width);
+      const h = parseInt(canvas.style.height);
+      ctx.clearRect(0, 0, w, h);
+
+      // Obtener paleta de colores reactiva desde el DOM!
+      const colors = getThemeColors();
+
+      // Dependiendo del tema (Ej: Ocean / Forest) se aplica un modificador de velocidad a 't' interno
+      let speedFactor = parseFloat(getComputedStyle(document.body).getPropertyValue('--animation-speed')) || 2;
+      // Normalizamos speedFactor porque speeds altas (0.8s en Neón) implican mayor velocidad, mientras (8s en Aurora) es menor.
+      let dt = 15; // default para transverse speed fluida
+      if (speedFactor < 2) dt = 25; // Mas rápido
+      if (speedFactor > 4) dt = 8; // Mas lento
+      
+      params.t += dt; 
+
+      drawGrid(w, h, colors);
+
+      if (params.mode === 'transverse') {
+        drawTransverse(w, h, colors);
+      } else {
+        drawLongitudinal(w, h, colors);
+      }
+
+      requestAnimationFrame(render);
+    }
+    
+    // Iniciar loop animacion
+    requestAnimationFrame(render);
+
+  </script>
+</body>
+</html>

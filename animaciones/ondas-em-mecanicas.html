@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulación: Ondas Electromagnéticas vs Mecánicas</title>
+  <style>
+    /* =========================================================
+       1. SISTEMA DE TEMAS (CSS CUSTOM PROPERTIES)
+       ========================================================= */
+    :root {
+      --bg-primary: #0E0E10;
+      --bg-secondary: #16161A;
+      --bg-tertiary: #1E1E24;
+      --text-primary: #F5F5F0;
+      --text-secondary: #A0A0B0;
+      --accent: #00E5FF;
+      --accent-secondary: #B100E8;
+      --accent-glow: rgba(0, 229, 255, 0.4);
+      --shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+      --border-color: rgba(0, 229, 255, 0.3);
+      --animation-speed: 2s;
+      --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+      --particle-color: #00E5FF;
+      --overlay-color: rgba(14, 14, 16, 0.7);
+    }
+
+    :root[data-theme="light"] {
+      --bg-primary: #FAFAF8;
+      --bg-secondary: #F0F0EE;
+      --bg-tertiary: #E5E5E2;
+      --text-primary: #1A1A1A;
+      --text-secondary: #5C5C66;
+      --accent: #0B4A99;
+      --accent-secondary: #E63946; /* Rojo brillante para el campo B */
+      --accent-glow: rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --border-color: rgba(0, 0, 0, 0.1);
+      --animation-speed: 4s;
+      --animation-easing: ease-in-out;
+      --particle-color: #0B4A99;
+      --overlay-color: rgba(250, 250, 248, 0.85);
+    }
+
+    :root[data-theme="dark"] {
+      --bg-primary: #0E0E10;
+      --bg-secondary: #1C1C22;
+      --bg-tertiary: #272730;
+      --text-primary: #F4F4F8;
+      --text-secondary: #8E8EA0;
+      --accent: #00E5FF;
+      --accent-secondary: #FF2A6D;
+      --accent-glow: rgba(0, 229, 255, 0.6);
+      --shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+      --border-color: rgba(0, 229, 255, 0.25);
+      --animation-speed: 1.5s;
+      --animation-easing: ease-in-out;
+      --particle-color: #00E5FF;
+      --overlay-color: rgba(14, 14, 16, 0.8);
+    }
+
+    :root[data-theme="forest"] {
+      --bg-primary: #1B2D1A;
+      --bg-secondary: #243B22;
+      --bg-tertiary: #314D2E;
+      --text-primary: #F5EDD6;
+      --text-secondary: #A8C09A;
+      --accent: #7FD44C;
+      --accent-secondary: #F9A03F;
+      --accent-glow: rgba(127, 212, 76, 0.2);
+      --shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      --border-color: rgba(127, 212, 76, 0.2);
+      --animation-speed: 5s;
+      --animation-easing: ease-in-out;
+      --particle-color: #7FD44C;
+      --overlay-color: rgba(27, 45, 26, 0.75);
+    }
+
+    :root[data-theme="sunset"] {
+      --bg-primary: linear-gradient(135deg, #FF6B35 0%, #F7C59F 50%, #6B2D8B 100%);
+      --bg-secondary: rgba(25, 10, 30, 0.5);
+      --bg-tertiary: rgba(0, 0, 0, 0.3);
+      --text-primary: #FFF0D6;
+      --text-secondary: #FFB380;
+      --accent: #FF356B;
+      --accent-secondary: #FFD166;
+      --accent-glow: rgba(255, 53, 107, 0.5);
+      --shadow: 0 10px 25px rgba(107, 45, 139, 0.5);
+      --border-color: rgba(255, 255, 255, 0.15);
+      --animation-speed: 6s;
+      --animation-easing: ease-in-out;
+      --particle-color: #FFFFFF;
+      --overlay-color: rgba(107, 45, 139, 0.6);
+    }
+
+    :root[data-theme="ocean"] {
+      --bg-primary: #0A1628;
+      --bg-secondary: #112B47;
+      --bg-tertiary: #19436A;
+      --text-primary: #E0F2FE;
+      --text-secondary: #7DD3FC;
+      --accent: #06B6D4;
+      --accent-secondary: #3B82F6;
+      --accent-glow: rgba(6, 182, 212, 0.4);
+      --shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+      --border-color: rgba(6, 182, 212, 0.3);
+      --animation-speed: 3.5s;
+      --animation-easing: ease-in-out;
+      --particle-color: #38BDF8;
+      --overlay-color: rgba(10, 22, 40, 0.7);
+    }
+
+    :root[data-theme="neon"] {
+      --bg-primary: #000000;
+      --bg-secondary: #0A0A0A;
+      --bg-tertiary: #141414;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B3B3B3;
+      --accent: #FF00FF;
+      --accent-secondary: #39FF14;
+      --accent-glow: rgba(255, 0, 255, 0.8);
+      --shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 40px var(--accent);
+      --border-color: var(--accent);
+      --animation-speed: 0.8s;
+      --animation-easing: steps(2);
+      --particle-color: #FFFF00;
+      --overlay-color: rgba(0, 0, 0, 0.9);
+    }
+
+    :root[data-theme="aurora"] {
+      --bg-primary: linear-gradient(-45deg, #020111, #20124d, #000022, #113333);
+      --bg-secondary: rgba(0, 0, 0, 0.4);
+      --bg-tertiary: rgba(0, 0, 0, 0.6);
+      --text-primary: #E8FFFB;
+      --text-secondary: #90E0D0;
+      --accent: #00FFAA;
+      --accent-secondary: #9D00FF;
+      --accent-glow: rgba(0, 255, 170, 0.6);
+      --shadow: 0 0 20px rgba(0, 255, 170, 0.3), inset 0 0 30px rgba(157, 0, 255, 0.1);
+      --border-color: rgba(0, 255, 170, 0.4);
+      --animation-speed: 8s;
+      --animation-easing: ease-in-out;
+      --particle-color: #00FFAA;
+      --overlay-color: rgba(2, 1, 17, 0.5);
+    }
+
+    /* =========================================================
+       2. ESTILOS GLOBALES E INTERFAZ
+       ========================================================= */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.8s ease, color 0.8s ease, box-shadow 0.8s ease, border-color 0.8s ease, text-shadow 0.8s ease;
+    }
+
+    body {
+      background: var(--bg-primary);
+      background-size: 400% 400%;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    :root[data-theme="sunset"] body, :root[data-theme="aurora"] body {
+      animation: gradientShift var(--animation-speed) ease infinite;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+      z-index: 10;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      transition: color 0.8s ease;
+    }
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 25px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all 0.8s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    :root[data-theme="forest"] .app-container { backdrop-filter: blur(4px); }
+    :root[data-theme="ocean"] .app-container { backdrop-filter: blur(25px); border-radius: 30px;}
+    :root[data-theme="neon"] h1 {
+      text-shadow: 0 0 5px var(--accent-secondary), 0 0 10px var(--accent-secondary);
+      animation: flicker var(--animation-speed) infinite alternate;
+    }
+    :root[data-theme="neon"] .app-container {
+      box-shadow: 0 0 15px var(--accent), inset 0 0 10px var(--accent);
+      border: 2px solid var(--accent);
+      border-radius: 0;
+    }
+
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+      20%, 24%, 55% { opacity: 0.5; }
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      margin-top: 15px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(255,255,255,0.05);
+      overflow: hidden;
+      transition: all 0.8s ease;
+      /* Patron de grid sutil detrás del canvas para dar perspectiva */
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    :root[data-theme="neon"] .canvas-wrapper { border-radius: 0; border: 1px solid var(--accent-secondary); }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .scanlines {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+      background-size: 100% 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    :root[data-theme="neon"] .scanlines { opacity: 1; }
+
+    /* Controles Superiores */
+    .controls-top {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 10px;
+      background: var(--bg-tertiary);
+      padding: 12px;
+      border-radius: 8px;
+    }
+    :root[data-theme="neon"] .controls-top { border-radius: 0; border: 1px solid var(--accent); }
+
+    label.radio-btn {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 1rem;
+      user-select: none;
+      transition: color 0.3s;
+    }
+    label.radio-btn input { display: none; }
+    .radio-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--text-secondary);
+      display: inline-block;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    :root[data-theme="neon"] .radio-circle { border-radius: 0; }
+    
+    label.radio-btn input:checked + .radio-circle {
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+    label.radio-btn input:checked + .radio-circle::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      transition: background 0.3s;
+    }
+    :root[data-theme="neon"] label.radio-btn input:checked + .radio-circle::after { border-radius: 0; }
+    label.radio-btn:hover { color: var(--accent); }
+
+    /* Controles Inferiores */
+    .controls-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-tertiary);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+    }
+    :root[data-theme="neon"] .controls-bottom { border-radius: 0; }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex: 1;
+      min-width: 200px;
+    }
+    .slider-label {
+      color: var(--text-secondary);
+      font-weight: bold;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 1.2rem;
+      width: 45px;
+      text-shadow: 0 0 2px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+    }
+    
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: var(--bg-primary);
+      border-radius: 3px;
+      border: 1px solid var(--border-color);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      box-shadow: var(--shadow);
+      border: 2px solid var(--bg-primary);
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -8px;
+      transition: transform 0.1s, background 0.5s;
+    }
+    /* El segundo slider (B0) usa el color secundario */
+    #bSlider::-webkit-slider-thumb {
+      background: var(--accent-secondary);
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    :root[data-theme="neon"] input[type=range]::-webkit-slider-thumb { border-radius: 0; border: 1px solid var(--text-primary); }
+    :root[data-theme="neon"] input[type=range]::-webkit-slider-runnable-track { border-radius: 0; }
+
+    .slider-value {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      min-width: 50px;
+      text-align: center;
+      font-family: monospace;
+      border: 1px solid var(--border-color);
+    }
+    :root[data-theme="neon"] .slider-value { border-radius: 0; }
+
+    /* Selector Temas UI Flotante */
+    .theme-selector-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 15px;
+    }
+
+    .theme-selector-toggle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      font-size: 1.5rem;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    :root[data-theme="neon"] .theme-selector-toggle { border-radius: 0; background: #000; }
+    .theme-selector-toggle:hover {
+      transform: scale(1.1) rotate(15deg);
+      background: var(--accent);
+      color: var(--bg-primary);
+    }
+
+    .theme-list {
+      display: flex;
+      flex-direction: column-reverse; /* Hacia arriba */
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px) scale(0.9);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: var(--bg-secondary);
+      padding: 12px;
+      border-radius: 30px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+    }
+    :root[data-theme="neon"] .theme-list { border-radius: 0; }
+    
+    .theme-selector-container:hover .theme-list,
+    .theme-list.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0) scale(1);
+    }
+
+    .theme-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-primary);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    :root[data-theme="neon"] .theme-btn { border-radius: 0; }
+    .theme-btn:hover { transform: scale(1.2); }
+    .theme-btn.active-theme::after {
+      content: '';
+      position: absolute;
+      top: -4px; right: -4px; bottom: -4px; left: -4px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+    }
+    :root[data-theme="neon"] .theme-btn.active-theme::after { border-radius: 0; }
+
+    /* Tooltip */
+    .theme-btn::before {
+      content: attr(data-name);
+      position: absolute;
+      right: 55px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .theme-btn:hover::before { opacity: 1; }
+
+    /* Colores estáticos visuales de botones */
+    .btn-light { background: #FAFAF8; }
+    .btn-dark { background: #0E0E10; }
+    .btn-forest { background: #1B2D1A; }
+    .btn-sunset { background: linear-gradient(135deg, #FF6B35, #6B2D8B); }
+    .btn-ocean { background: #0A1628; }
+    .btn-neon { background: #000; border-color: #FF00FF !important; }
+    .btn-aurora { background: linear-gradient(-45deg, #20124d, #113333); }
+
+    /* Leyendas en Canvas */
+    .legend {
+      position: absolute;
+      top: 15px; left: 15px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      pointer-events: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .color-box { width: 12px; height: 12px; border-radius: 2px; }
+    :root[data-theme="neon"] .legend { border-radius: 0; }
+    
+  </style>
+</head>
+<body>
+
+  <div class="theme-selector-container" id="themeContainer">
+    <div class="theme-list" id="themeList">
+      <button class="theme-btn btn-aurora" data-theme-val="aurora" data-name="Aurora"></button>
+      <button class="theme-btn btn-neon" data-theme-val="neon" data-name="Neon"></button>
+      <button class="theme-btn btn-ocean" data-theme-val="ocean" data-name="Ocean"></button>
+      <button class="theme-btn btn-sunset" data-theme-val="sunset" data-name="Sunset"></button>
+      <button class="theme-btn btn-forest" data-theme-val="forest" data-name="Forest"></button>
+      <button class="theme-btn btn-dark" data-theme-val="dark" data-name="Dark"></button>
+      <button class="theme-btn btn-light" data-theme-val="light" data-name="Light"></button>
+    </div>
+    <div class="theme-selector-toggle" id="themeToggle">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        <circle cx="12" cy="12" r="5"/>
+      </svg>
+    </div>
+  </div>
+
+  <header>
+    <h1>Naturaleza de la Propagación</h1>
+    <h2>Ondas Electromagnéticas (Vacío) vs Ondas Mecánicas (Medio Material)</h2>
+  </header>
+
+  <div class="app-container">
+    <div class="controls-top">
+      <label class="radio-btn">
+        <input type="radio" name="waveType" value="em" checked>
+        <span class="radio-circle"></span>
+        Electromagnética (3D)
+      </label>
+      <label class="radio-btn">
+        <input type="radio" name="waveType" value="mech">
+        <span class="radio-circle"></span>
+        Mecánica (Materia en 3D)
+      </label>
+    </div>
+
+    <div class="canvas-wrapper">
+      <div class="legend" id="simLegend">
+        <div class="legend-item"><div class="color-box" id="legendAccent1" style="background:var(--accent)"></div> Campo Eléctrico ($E$)</div>
+        <div class="legend-item" id="legendItem2"><div class="color-box" id="legendAccent2" style="background:var(--accent-secondary)"></div> Campo Magnético ($B$)</div>
+      </div>
+      <div class="scanlines"></div>
+      <canvas id="waveCanvas"></canvas>
+    </div>
+
+    <div class="controls-bottom">
+      <div class="slider-group">
+        <span class="slider-label" id="labelA"><i>E₀</i></span>
+        <input type="range" id="aSlider" min="20" max="150" value="100">
+        <span class="slider-value" id="aVal">100</span>
+      </div>
+      <div class="slider-group" id="bSliderContainer">
+        <span class="slider-label"><i>B₀</i></span>
+        <input type="range" id="bSlider" min="20" max="150" value="80">
+        <span class="slider-value" id="bVal">80</span>
+      </div>
+      <div class="slider-group">
+        <span class="slider-label"><i>&lambda;</i></span>
+        <input type="range" id="lambdaSlider" min="100" max="500" value="250">
+        <span class="slider-value" id="lambdaVal">250</span>
+      </div>
+      <div class="slider-group">
+        <span class="slider-label"><i>f</i></span>
+        <input type="range" id="freqSlider" min="1" max="50" value="15">
+        <span class="slider-value" id="freqVal">0.015</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ------------------------------------------------------------------
+       1. SISTEMA DE TEMAS EN JS
+       ------------------------------------------------------------------ */
+    const rootEl = document.documentElement;
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    let currentTheme = localStorage.getItem('app-theme') || 'dark'; 
+
+    function applyTheme(themeName) {
+      if(!themeName) return;
+      rootEl.setAttribute('data-theme', themeName);
+      themeBtns.forEach(btn => {
+        if(btn.dataset.themeVal === themeName && themeName === currentTheme) {
+          btn.classList.add('active-theme');
+        } else {
+          btn.classList.remove('active-theme');
+        }
+      });
+      // Actualizar visualmente la leyenda de colores
+      setTimeout(() => {
+        const computed = getComputedStyle(document.body);
+        document.getElementById('legendAccent1').style.background = computed.getPropertyValue('--accent');
+        document.getElementById('legendAccent2').style.background = computed.getPropertyValue('--accent-secondary');
+      }, 50);
+    }
+    applyTheme(currentTheme);
+
+    themeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const theme = e.target.dataset.themeVal;
+        currentTheme = theme;
+        localStorage.setItem('app-theme', theme);
+        applyTheme(theme);
+      });
+      btn.addEventListener('mouseenter', (e) => {
+        rootEl.setAttribute('data-theme', e.target.dataset.themeVal);
+      });
+      btn.addEventListener('mouseleave', () => {
+        applyTheme(currentTheme);
+      });
+    });
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      document.getElementById('themeList').classList.toggle('active');
+    });
+
+    /* ------------------------------------------------------------------
+       2. LÓGICA DE SIMULACIÓN Y MOTOR 3D CANVAS
+       ------------------------------------------------------------------ */
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // UI Elements
+    const radios = document.getElementsByName('waveType');
+    const aSlider = document.getElementById('aSlider');
+    const bSlider = document.getElementById('bSlider');
+    const lambdaSlider = document.getElementById('lambdaSlider');
+    const freqSlider = document.getElementById('freqSlider');
+    
+    const labelA = document.getElementById('labelA');
+    const bSliderContainer = document.getElementById('bSliderContainer');
+    const legendItem2 = document.getElementById('legendItem2');
+
+    const aVal = document.getElementById('aVal');
+    const bVal = document.getElementById('bVal');
+    const lambdaVal = document.getElementById('lambdaVal');
+    const freqVal = document.getElementById('freqVal');
+
+    // Estado físico
+    let params = {
+      type: 'em', // em | mech
+      E0: parseInt(aSlider.value), // Amplitud Eléctrica / Mecánica General
+      B0: parseInt(bSlider.value), // Amplitud Magnética
+      lambda: parseInt(lambdaSlider.value), 
+      f: parseInt(freqSlider.value) / 1000,
+      t: 0 
+    };
+
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Listeners Controles
+    radios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        params.type = e.target.value;
+        if(params.type === 'mech') {
+          // Si es mecánica modificamos UI para ocultar B0
+          bSliderContainer.style.opacity = '0.3';
+          bSlider.disabled = true;
+          labelA.innerHTML = '<i>A</i>';
+          legendItem2.style.display = 'none';
+          document.getElementById('legendAccent1').parentNode.innerHTML = `<div class="color-box" id="legendAccent1" style="background:var(--accent)"></div> Partículas del Medio`;
+        } else {
+          bSliderContainer.style.opacity = '1';
+          bSlider.disabled = false;
+          labelA.innerHTML = '<i>E₀</i>';
+          legendItem2.style.display = 'flex';
+          const acc = getComputedStyle(document.body).getPropertyValue('--accent');
+          document.getElementById('legendAccent1').parentNode.innerHTML = `<div class="color-box" id="legendAccent1" style="background:${acc}"></div> Campo Eléctrico (E)`;
+        }
+      });
+    });
+
+    aSlider.addEventListener('input', e => { params.E0 = parseInt(e.target.value); aVal.textContent = params.E0; });
+    bSlider.addEventListener('input', e => { params.B0 = parseInt(e.target.value); bVal.textContent = params.B0; });
+    lambdaSlider.addEventListener('input', e => { params.lambda = parseInt(e.target.value); lambdaVal.textContent = params.lambda; });
+    freqSlider.addEventListener('input', e => { params.f = parseInt(e.target.value)/1000; freqVal.textContent = (params.f).toFixed(3); });
+
+    function getThemeColors() {
+      const computedStyle = getComputedStyle(document.body);
+      return {
+        accent: computedStyle.getPropertyValue('--accent').trim(),
+        accentSecondary: computedStyle.getPropertyValue('--accent-secondary').trim(),
+        particle: computedStyle.getPropertyValue('--particle-color').trim(),
+        bgPrimary: computedStyle.getPropertyValue('--bg-primary').trim(),
+        textPrimary: computedStyle.getPropertyValue('--text-primary').trim(),
+        textSecondary: computedStyle.getPropertyValue('--text-secondary').trim(),
+        border: computedStyle.getPropertyValue('--border-color').trim()
+      };
+    }
+
+    // Funciones de proyección 3D a 2D Isometrica (Caballera modificada)
+    // El eje x va a la derecha. Eje Y arriba. Eje Z se proyecta en ángulo.
+    const angleZ = Math.PI / 6; // 30 grados
+    let centerX, centerY;
+
+    function project3D(x, y, z) {
+      // Proyección: x de frente, y hacia arriba (negativo en canvas), z entra/sale en diagonal
+      // Z positivo entra a la pantalla (hacia arriba derecha)
+      const px = centerX + x - z * Math.cos(angleZ)*0.6;
+      const py = centerY - y + z * Math.sin(angleZ)*0.6; 
+      return { x: px, y: py };
+    }
+
+    function drawAxes(w, h, colors) {
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = colors.textSecondary;
+      ctx.globalAlpha = 0.6;
+
+      // X Axis (Propagación)
+      let p1 = project3D(-50, 0, 0);
+      let p2 = project3D(w - 200, 0, 0); // Línea principal
+      ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+      drawArrow(ctx, p1.x, p1.y, p2.x, p2.y, colors.textSecondary, 10);
+      ctx.fillStyle = colors.textPrimary; ctx.font = "italic 16px 'Times New Roman'";
+      ctx.fillText("x (v)", p2.x + 10, p2.y + 5);
+
+      // Y Axis (E)
+      p1 = project3D(0, -180, 0);
+      p2 = project3D(0, 180, 0);
+      ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+      if(params.type === 'em') {
+        drawArrow(ctx, p1.x, p1.y, p2.x, p2.y, colors.textSecondary, 10);
+        ctx.fillText("y (E)", p2.x - 5, p2.y - 15);
+      } else {
+        ctx.fillText("y", p2.x - 5, p2.y - 15);
+      }
+
+      // Z Axis (B)
+      p1 = project3D(0, 0, -200);
+      p2 = project3D(0, 0, 200);
+      ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+      if(params.type === 'em') {
+        drawArrow(ctx, p1.x, p1.y, p2.x, p2.y, colors.textSecondary, 10);
+        ctx.fillText("z (B)", p2.x + 10, p2.y + 10);
+      } else {
+        ctx.fillText("z", p2.x + 10, p2.y + 10);
+      }
+
+      ctx.globalAlpha = 1.0;
+    }
+
+    function drawArrow(context, fromx, fromy, tox, toy, color, headlen=6) {
+        var dx = tox - fromx;
+        var dy = toy - fromy;
+        var angle = Math.atan2(dy, dx);
+        context.beginPath();
+        context.moveTo(tox, toy);
+        context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+        context.moveTo(tox, toy);
+        context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+        context.strokeStyle = color;
+        context.stroke();
+    }
+
+    function drawEMWave(w, colors) {
+      const k = (2 * Math.PI) / params.lambda;
+      const omega = 2 * Math.PI * params.f;
+      const numSteps = 400; // Resolución a lo largo de X
+      const maxX = w - 200; // Largo de la onda
+      const step = maxX / numSteps;
+
+      if(currentTheme === 'neon' || currentTheme === 'dark') {
+         ctx.shadowBlur = 12;
+      }
+
+      // Dibujar Campo Mágnetico (Plano XZ)
+      // Lo dibujamos primero para que quede "debajo" por la perspectiva si es necesario
+      ctx.strokeStyle = colors.accentSecondary;
+      ctx.fillStyle = colors.accentSecondary;
+      ctx.shadowColor = colors.accentSecondary;
+      ctx.lineWidth = 2;
+      
+      ctx.beginPath();
+      let startProj = project3D(0, 0, 0);
+      ctx.moveTo(startProj.x, startProj.y);
+      for(let x=0; x<=maxX; x+=step) {
+        // Onda viajera hacia +x
+        let z = params.B0 * Math.sin(k * x - omega * params.t);
+        let p = project3D(x, 0, z);
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+
+      // Vectores de Campo Magnético (Fill Lines)
+      ctx.globalAlpha = 0.4;
+      for(let x=0; x<=maxX; x+= step*8) {
+        let z = params.B0 * Math.sin(k * x - omega * params.t);
+        let endP = project3D(x, 0, z);
+        let startP = project3D(x, 0, 0);
+        ctx.beginPath();
+        ctx.moveTo(startP.x, startP.y);
+        ctx.lineTo(endP.x, endP.y);
+        ctx.stroke();
+        drawArrow(ctx, startP.x, startP.y, endP.x, endP.y, colors.accentSecondary, 4);
+      }
+      ctx.globalAlpha = 1.0;
+
+
+      // Dibujar Campo Eléctrico (Plano XY)
+      ctx.strokeStyle = colors.accent;
+      ctx.fillStyle = colors.accent;
+      ctx.shadowColor = colors.accent;
+      
+      ctx.beginPath();
+      ctx.moveTo(startProj.x, startProj.y);
+      for(let x=0; x<=maxX; x+=step) {
+        let y = params.E0 * Math.sin(k * x - omega * params.t);
+        let p = project3D(x, y, 0);
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+
+      // Vectores de Campo Eléctrico
+      ctx.globalAlpha = 0.5;
+      for(let x=0; x<=maxX; x+= step*8) {
+        let y = params.E0 * Math.sin(k * x - omega * params.t);
+        let endP = project3D(x, y, 0);
+        let startP = project3D(x, 0, 0);
+        ctx.beginPath();
+        ctx.moveTo(startP.x, startP.y);
+        ctx.lineTo(endP.x, endP.y);
+        ctx.stroke();
+        drawArrow(ctx, startP.x, startP.y, endP.x, endP.y, colors.accent, 5);
+      }
+      ctx.globalAlpha = 1.0;
+      ctx.shadowBlur = 0; // reset
+    }
+
+    function drawMechanicalWave(w, colors) {
+      // Simula partículas de materia interconectadas oscilando en transversal pero en perspectiva volumétrica
+      const k = (2 * Math.PI) / params.lambda;
+      const omega = 2 * Math.PI * params.f;
+      const maxX = w - 150;
+      
+      // Dibujaremos múltiples 'cuerdas' o capas de partículas para dar la sensación de un 'medio' material en 3D
+      const zOffsets = [-40, -20, 0, 20, 40];
+
+      if(currentTheme === 'neon' || currentTheme === 'aurora') {
+         ctx.shadowBlur = 15;
+         ctx.shadowColor = colors.accent;
+      }
+
+      ctx.lineWidth = 1.5;
+      
+      // Para cada capa Z (profundidad en el material)
+      for(let j=0; j<zOffsets.length; j++) {
+        let zPos = zOffsets[j];
+        
+        ctx.strokeStyle = colors.border; // Representación de los "enlaces" del medio material
+        
+        // Desfases ligeros en X o phase para dar efecto de elasticidad
+        let phase = zPos * 0.02; 
+        
+        ctx.beginPath();
+        let first = true;
+        
+        // Dibujar Enlaces y Partículas
+        for(let x=0; x<=maxX; x+=15) {
+          // Desplazamiento Transversal en Y
+          let y = params.E0 * Math.sin(k * x - omega * params.t + phase);
+          let p = project3D(x, y, zPos);
+          
+          if(first) { ctx.moveTo(p.x, p.y); first = false;}
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+
+        // Partículas (Moléculas del medio)
+        for(let x=0; x<=maxX; x+=25) {
+          let y = params.E0 * Math.sin(k * x - omega * params.t + phase);
+          let p = project3D(x, y, zPos);
+          
+          ctx.beginPath();
+          // Variación de tamaño por perspectiva z
+          let radius = 4 - (zPos/40);
+          ctx.arc(p.x, p.y, Math.max(radius, 1.5), 0, Math.PI*2);
+          
+          // Color degradado dependiendo profundidad para pseudo-3D
+          let opacity = 1 - Math.abs(zPos)/100;
+          ctx.fillStyle = colors.accent;
+          ctx.globalAlpha = opacity;
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1.0;
+      ctx.shadowBlur = 0;
+    }
+
+    function render() {
+      const w = parseInt(canvas.style.width);
+      const h = parseInt(canvas.style.height);
+      
+      centerX = w * 0.15; // Mover centro un poco a la izquierda
+      centerY = h * 0.5;
+
+      ctx.clearRect(0, 0, w, h);
+      const colors = getThemeColors();
+
+      let speedFactor = parseFloat(getComputedStyle(document.body).getPropertyValue('--animation-speed')) || 2;
+      let dt = 15; 
+      if (speedFactor < 2) dt = 25; 
+      if (speedFactor > 5) dt = 8; 
+      params.t += dt; 
+
+      drawAxes(w, h, colors);
+
+      if (params.type === 'em') {
+        drawEMWave(w, colors);
+      } else {
+        drawMechanicalWave(w, colors);
+      }
+
+      requestAnimationFrame(render);
+    }
+    
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>

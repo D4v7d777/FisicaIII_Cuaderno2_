@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Física III | Movimiento Ondulatorio</title>
+  
+  <!-- CSS Frameworks & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Math Rendering (KaTeX) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  
+  <!-- Optional MathJax fallback -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <!-- Highlight.js for code blocks -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+
+  <!-- ═══ SPLASH SCREEN ═══ -->
+  <div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:#0a0e1a;overflow:hidden;transition:opacity 0.8s ease, transform 0.8s ease;">
+    <!-- Canvas for physics animation -->
+    <canvas id="splashCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%;"></canvas>
+
+    <!-- Overlay content -->
+    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:20px;max-width:100%;overflow:hidden;">
+      
+      <!-- Title -->
+      <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:900;background:linear-gradient(135deg,#00f3ff,#39ff14,#ab80ff,#ff6b9d);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:splashGrad 4s ease infinite;margin-bottom:8px;letter-spacing:2px;text-shadow:none;">
+        FÍSICA III
+      </h1>
+      <p style="font-family:'Inter',sans-serif;font-size:clamp(0.9rem,2vw,1.3rem);color:rgba(255,255,255,0.6);letter-spacing:6px;text-transform:uppercase;margin-bottom:30px;">Movimiento Ondulatorio</p>
+
+      <!-- Authors -->
+      <div style="display:flex;gap:30px;margin-bottom:35px;flex-wrap:wrap;justify-content:center;">
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:50px;padding:8px 20px;backdrop-filter:blur(6px);">
+          <i class="fas fa-user-graduate" style="color:#00f3ff;font-size:1rem;"></i>
+          <span style="font-family:'Inter',sans-serif;color:rgba(255,255,255,0.8);font-size:0.9rem;">Harold Ordoñez</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:50px;padding:8px 20px;backdrop-filter:blur(6px);">
+          <i class="fas fa-user-graduate" style="color:#39ff14;font-size:1rem;"></i>
+          <span style="font-family:'Inter',sans-serif;color:rgba(255,255,255,0.8);font-size:0.9rem;">Steven David</span>
+        </div>
+      </div>
+
+      <!-- Topics grid -->
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:700px;margin-bottom:clamp(20px,5vh,50px);">
+        <span class="splash-topic" style="--delay:0s;">Ondas Mecánicas</span>
+        <span class="splash-topic" style="--delay:0.3s;">Ecuación de Onda</span>
+        <span class="splash-topic" style="--delay:0.6s;">Velocidad de Propagación</span>
+        <span class="splash-topic" style="--delay:0.9s;">Ondas Estacionarias</span>
+        <span class="splash-topic" style="--delay:1.2s;">Interferencia</span>
+        <span class="splash-topic" style="--delay:1.5s;">Superposición</span>
+        <span class="splash-topic" style="--delay:1.8s;">Ondas Armónicas</span>
+      </div>
+
+      <!-- COMENZAR button -->
+      <button id="btnComenzar" onclick="dismissSplash()" style="font-family:'Outfit',sans-serif;font-size:clamp(0.9rem,2.5vw,1.2rem);font-weight:700;padding:clamp(10px,2vh,16px) clamp(30px,8vw,60px);background:linear-gradient(135deg,#00f3ff,#39ff14);color:#0a0e1a;border:none;border-radius:50px;cursor:pointer;letter-spacing:3px;text-transform:uppercase;box-shadow:0 0 30px rgba(0,243,255,0.4),0 0 60px rgba(57,255,20,0.2);transition:transform 0.3s ease,box-shadow 0.3s ease;animation:splashPulseBtn 2s ease-in-out infinite;">
+        <i class="fas fa-play" style="margin-right:10px;"></i>COMENZAR
+      </button>
+    </div>
+  </div>
+
+  <style>
+    @keyframes splashGrad {
+      0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
+    }
+    @keyframes splashPulseBtn {
+      0%,100%{transform:scale(1);box-shadow:0 0 30px rgba(0,243,255,0.4),0 0 60px rgba(57,255,20,0.2);}
+      50%{transform:scale(1.05);box-shadow:0 0 50px rgba(0,243,255,0.6),0 0 90px rgba(57,255,20,0.3);}
+    }
+    @keyframes splashTopicIn {
+      0%{opacity:0;transform:translateY(15px);}
+      100%{opacity:1;transform:translateY(0);}
+    }
+    .splash-topic {
+      font-family:'Inter',sans-serif;font-size:0.8rem;color:rgba(255,255,255,0.7);
+      padding:8px 18px;border-radius:30px;
+      background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+      backdrop-filter:blur(4px);
+      animation:splashTopicIn 0.6s ease forwards;
+      animation-delay:var(--delay);
+      opacity:0;
+    }
+    #btnComenzar:hover {
+      transform: scale(1.1) !important;
+      box-shadow: 0 0 60px rgba(0,243,255,0.8),0 0 120px rgba(57,255,20,0.4) !important;
+    }
+  </style>
+
+  <script>
+  // ═══ SPLASH SCREEN ANIMATION ═══
+  (function() {
+    const canvas = document.getElementById('splashCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, dpr, animId;
+    let t = 0;
+
+    function resize() {
+      dpr = window.devicePixelRatio || 1;
+      W = canvas.width = window.innerWidth * dpr;
+      H = canvas.height = window.innerHeight * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Particles
+    const particles = [];
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: Math.random() * 2 + 0.5,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        alpha: Math.random() * 0.4 + 0.1,
+        hue: Math.random() * 360
+      });
+    }
+
+    function drawParticles() {
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = window.innerWidth;
+        if (p.x > window.innerWidth) p.x = 0;
+        if (p.y < 0) p.y = window.innerHeight;
+        if (p.y > window.innerHeight) p.y = 0;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${p.hue}, 80%, 70%, ${p.alpha})`;
+        ctx.fill();
+      });
+    }
+
+    // Standing wave (top)
+    function drawStandingWave() {
+      const waveY = window.innerHeight * 0.15;
+      const amp = 40;
+      const L = window.innerWidth;
+      const k = Math.PI * 4 / L; // 2 full wavelengths
+
+      ctx.beginPath();
+      for (let px = 0; px < L; px += 2) {
+        const y = waveY + amp * Math.sin(k * px) * Math.cos(t * 3);
+        if (px === 0) ctx.moveTo(px, y); else ctx.lineTo(px, y);
+      }
+      ctx.strokeStyle = 'rgba(0, 243, 255, 0.8)';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Envelopes
+      ctx.beginPath();
+      for (let px = 0; px < L; px += 2) {
+        const y = waveY + amp * Math.sin(k * px);
+        if (px === 0) ctx.moveTo(px, y); else ctx.lineTo(px, y);
+      }
+      ctx.strokeStyle = 'rgba(0, 243, 255, 0.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.beginPath();
+      for (let px = 0; px < L; px += 2) {
+        const y = waveY - amp * Math.sin(k * px);
+        if (px === 0) ctx.moveTo(px, y); else ctx.lineTo(px, y);
+      }
+      ctx.stroke();
+    }
+
+    // Longitudinal wave (right side)
+    function drawLongitudinalWave() {
+      const cx = window.innerWidth * 0.82;
+      const cy = window.innerHeight * 0.35;
+      const width = 250;
+      const lines = 40;
+      const amp = 15;
+      const k = Math.PI * 4 / width; // 2 wavelengths
+      const w = 3;
+
+      ctx.strokeStyle = 'rgba(57, 255, 20, 0.6)';
+      ctx.lineWidth = 2;
+
+      for (let i = 0; i < lines; i++) {
+        const baseX = cx - width/2 + (i / (lines-1)) * width;
+        const displacement = amp * Math.cos(k * (baseX - cx) - t * w);
+        const x = baseX + displacement;
+
+        ctx.beginPath();
+        ctx.moveTo(x, cy - 30);
+        ctx.lineTo(x, cy + 30);
+        ctx.stroke();
+        
+        if (i % 5 === 0) {
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#39ff14';
+            ctx.beginPath();
+            ctx.arc(x, cy, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#39ff14';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+      }
+    }
+
+    // Wave across the bottom
+    function drawWave() {
+      const waveY = window.innerHeight * 0.82;
+      const amp = 30;
+      const freq = 0.015;
+
+      // Glow wave
+      ctx.beginPath();
+      for (let px = 0; px < window.innerWidth; px += 2) {
+        const y = waveY + amp * Math.sin(freq * px * 2 * Math.PI + t * 2.2);
+        if (px === 0) ctx.moveTo(px, y); else ctx.lineTo(px, y);
+      }
+      ctx.strokeStyle = 'rgba(171, 128, 255, 0.5)';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Shadow wave shifted
+      ctx.beginPath();
+      for (let px = 0; px < window.innerWidth; px += 2) {
+        const y = waveY + amp * 0.6 * Math.sin(freq * px * 2 * Math.PI + t * 2.2 + 1.2);
+        if (px === 0) ctx.moveTo(px, y); else ctx.lineTo(px, y);
+      }
+      ctx.strokeStyle = 'rgba(255, 107, 157, 0.3)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Moving dot on main wave
+      const dotX = ((t * 60) % window.innerWidth);
+      const dotY = waveY + amp * Math.sin(freq * dotX * 2 * Math.PI + t * 2.2);
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = '#ab80ff';
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // 2D Wave Interference (left side)
+    function drawInterference() {
+      const cx1 = window.innerWidth * 0.18;
+      const cy1 = window.innerHeight * 0.35;
+      const cx2 = cx1 + 60; // Source separation
+      const cy2 = cy1;
+      const maxR = 150;
+      const w = 4;
+      const k = 0.2;
+
+      ctx.lineWidth = 1.5;
+      for (let r = 0; r < maxR; r += 5) {
+        let phase = k * r - t * w;
+        let amp = Math.cos(phase);
+        if (amp > 0) {
+          ctx.beginPath();
+          ctx.arc(cx1, cy1, r, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(171, 128, 255, ${amp * (1 - r/maxR) * 0.5})`;
+          ctx.stroke();
+        }
+        
+        phase = k * r - t * w;
+        amp = Math.cos(phase);
+        if (amp > 0) {
+          ctx.beginPath();
+          ctx.arc(cx2, cy2, r, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(0, 243, 255, ${amp * (1 - r/maxR) * 0.5})`;
+          ctx.stroke();
+        }
+      }
+      
+      // Sources
+      ctx.beginPath(); ctx.arc(cx1, cy1, 4, 0, Math.PI*2); ctx.fillStyle='#ab80ff'; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx2, cy2, 4, 0, Math.PI*2); ctx.fillStyle='#00f3ff'; ctx.fill();
+    }
+
+    // Grid
+    function drawGrid() {
+      const step = 60;
+      ctx.strokeStyle = 'rgba(255,255,255,0.015)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < window.innerWidth; x += step) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, window.innerHeight); ctx.stroke();
+      }
+      for (let y = 0; y < window.innerHeight; y += step) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(window.innerWidth, y); ctx.stroke();
+      }
+    }
+
+    function loop() {
+      const splash = document.getElementById('splashScreen');
+      if (!splash || splash.style.display === 'none') return;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+      drawGrid();
+      drawParticles();
+      drawStandingWave();
+      drawLongitudinalWave();
+      drawWave();
+      drawInterference();
+
+      t += 0.016;
+      animId = requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    window.dismissSplash = function() {
+      const splash = document.getElementById('splashScreen');
+      splash.style.opacity = '0';
+      splash.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        splash.style.display = 'none';
+        cancelAnimationFrame(animId);
+      }, 800);
+    };
+  })();
+  </script>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="authors">harold ordoñez and steven david</div>
+      <h1 class="logo">FISICA III</h1>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <button class="nav-btn" onclick="appState.goHome()">
+        <i class="fas fa-home"></i> <span>Inicio</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-book-medical"></i> <span>Crear cuaderno</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-user-circle"></i> <span>Iniciar sesión</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-cog"></i> <span>Configuración</span>
+      </button>
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" style="margin-bottom: 5px;">
+        <i class="fas fa-sun" id="themeIcon"></i> <span id="themeLabel">Modo Claro</span>
+      </button>
+      <div id="themeSelectorSidebar" style="display:flex; justify-content:center; gap:8px; padding:5px 0 15px 0; flex-wrap:wrap">
+        <button onclick="setTheme('light')" title="Light" style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(0,0,0,0.2);background:#FAFAF8;cursor:pointer;transition:transform 0.2s"></button>
+        <button onclick="setTheme('dark')" title="Dark" style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(0,245,255,0.3);background:#0E0E10;cursor:pointer;transition:transform 0.2s"></button>
+        <button onclick="setTheme('forest')" title="Forest" style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(127,212,76,0.3);background:#1B2D1A;cursor:pointer;transition:transform 0.2s"></button>
+        <button onclick="setTheme('sunset')" title="Sunset" style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,107,53,0.3);background:#1A0A00;cursor:pointer;transition:transform 0.2s"></button>
+        <button onclick="setTheme('ocean')" title="Ocean" style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(0,188,212,0.3);background:#0A1628;cursor:pointer;transition:transform 0.2s"></button>
+        <button onclick="setTheme('neon')" title="Neon" style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,0,127,0.4);background:#000;cursor:pointer;transition:transform 0.2s"></button>
+        <button onclick="setTheme('aurora')" title="Aurora" style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(105,240,174,0.3);background:#050A14;cursor:pointer;transition:transform 0.2s"></button>
+      </div>
+      <button class="nav-btn btn-danger-outline">
+        <i class="fas fa-sign-out-alt"></i> <span>Salir perfil</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- ═══ MAIN CONTENT AREA ═══ -->
+  <main class="main-content">
+
+    <!-- ── VIEW 1: DASHBOARD HOME ── -->
+    <div id="view-home" class="view-panel active">
+      <h2 class="view-title">Tus Cuadernos de Física</h2>
+      
+      <!-- Notebook Grid -->
+      <div class="dashboard-grid">
+        <div class="dash-card notebook-card" onclick="appState.openNotebook(1)">
+          <div class="dash-icon"><i class="fas fa-book"></i></div>
+          <h3>Cuaderno 1</h3>
+          <p>Movimiento Ondulatorio y Ecuación de Onda</p>
+          <div class="glow-effect"></div>
+        </div>
+        
+        <div class="dash-card add-card">
+          <div class="dash-icon"><i class="fas fa-plus-circle"></i></div>
+          <h3>Agregar Cuaderno</h3>
+          <p>Crear un nuevo espacio de estudio</p>
+        </div>
+      </div>
+
+      <h2 class="view-title" style="margin-top: 40px;">Animaciones Interactivas</h2>
+      <div class="dashboard-grid anim-grid" id="animGrid">
+
+        <div class="dash-card anim-card" data-anim-src="./animaciones/ondas-armonicas.html" data-anim-title="Ondas Armónicas Viajeras">
+          <div class="anim-preview"><i class="fas fa-wave-square" style="font-size:3rem;color:var(--neon-green);z-index:2;position:relative"></i></div>
+          <div class="anim-info"><h3>Ondas Armónicas</h3><p>Representación Matemática en el Plano Cartesiano</p></div>
+        </div>
+
+        <div class="dash-card anim-card" data-anim-src="./animaciones/ondas-em-mecanicas.html" data-anim-title="Ondas Electromagnéticas vs Mecánicas">
+          <div class="anim-preview"><i class="fas fa-broadcast-tower" style="font-size:3rem;color:#06b6d4;z-index:2;position:relative"></i></div>
+          <div class="anim-info"><h3 style="color:#06b6d4">Ondas Electromagnéticas vs Mecánicas</h3><p>Naturaleza de la Propagación</p></div>
+        </div>
+
+        <div class="dash-card anim-card" data-anim-src="./animaciones/ondas-superposicion.html" data-anim-title="Superposición de Ondas (Interferencia)">
+          <div class="anim-preview"><i class="fas fa-layer-group" style="font-size:3rem;color:var(--neon-blue);z-index:2;position:relative"></i></div>
+          <div class="anim-info"><h3>Superposición de Ondas</h3><p>Interacción entre dos ondas armónicas</p></div>
+        </div>
+
+        <div class="dash-card anim-card" data-anim-src="./animaciones/ondas-temas.html" data-anim-title="Ondas Transversales y Longitudinales">
+          <div class="anim-preview"><i class="fas fa-project-diagram" style="font-size:3rem;color:#ab80ff;z-index:2;position:relative"></i></div>
+          <div class="anim-info"><h3>Transversales y Longitudinales</h3><p>Laboratorio de Ondas</p></div>
+        </div>
+
+      </div>
+
+      <!-- ── Videos Guía ── -->
+      <h2 class="view-title" style="margin-top: 40px;"><i class="fas fa-play-circle" style="color:var(--neon-blue)"></i> Videos Guía</h2>
+      <div class="video-grid">
+        <div class="video-card">
+          <a href="https://youtu.be/3b4Vv8zIwt4?si=y4RfqwaY0XDqKJTE" target="_blank" style="text-decoration:none; display:block; position:relative;">
+            <div class="video-wrapper"><img src="imagenes/video_movimiento_ondulatorio.png" alt="Video Movimiento Ondulatorio" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:rgba(255,255,255,0.7);text-shadow:0 0 10px rgba(0,0,0,0.8);"><i class="fas fa-play-circle" style="color:#ff0000; background:#fff; border-radius:50%;"></i></div>
+          </a>
+          <div class="anim-info"><h3>Movimiento Ondulatorio</h3><p>Conceptos fundamentales de ondas mecánicas</p></div>
+          <div style="display:flex;justify-content:center;margin-top:8px;"><div id="qr-video1" style="width:80px;height:80px;"></div></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ── VIEW 2: NOTEBOOK 1 (Movimiento Ondulatorio) ── -->
+    <div id="view-nb1" class="view-panel notebook-view">
+      <div class="notebook-header">
+        <button class="btn btn-back" onclick="appState.goHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <h2>Cuaderno 1: Movimiento Ondulatorio</h2>
+        <div class="book-actions"><button class="btn btn-icon" onclick="BookCtrl.fullscreen('nb1')" title="Pantalla completa"><i class="fas fa-expand"></i></button></div>
+      </div>
+
+      <div class="book-scene" id="scene-nb1">
+        <div class="spiral-spine" id="spine-nb1"></div>
+        <div class="book" id="book-nb1">
+
+          <!-- COVER PAGE -->
+          <div class="page" style="z-index:9">
+            <div class="page-front">
+              <div class="book-cover">
+                <h2>Cuaderno 1</h2>
+                <p class="cover-subtitle">Movimiento Ondulatorio</p>
+                <div class="cover-animation">
+                  <div class="cover-pendulum"></div>
+                </div>
+                <div class="cover-wave">
+                  <svg viewBox="0 0 300 40" preserveAspectRatio="none">
+                    <path class="wave-path" d="M0 20 Q25 0 50 20 T100 20 T150 20 T200 20 T250 20 T300 20 T350 20 T400 20" stroke="rgba(0,243,255,0.3)" fill="none" stroke-width="1.5"/>
+                  </svg>
+                </div>
+                <p style="color:var(--text-muted);font-size:0.7rem;margin-top:16px">Haz clic en ▶ para pasar la página</p>
+              </div>
+            </div>
+            <div class="page-back tex-content">
+              <div class="page-number">ii</div>
+              <h3>Índice de Contenido</h3>
+              <ul>
+                <li>¿Qué es una Onda?</li>
+                <li>Clasificación de Ondas</li>
+                <li>Ecuación de Onda General</li>
+                <li>Parámetros de una Onda</li>
+                <li>Velocidad de Propagación</li>
+                <li>Energía Transportada por Ondas</li>
+                <li>Ondas en Cuerdas</li>
+                <li>Ondas Sonoras</li>
+                <li>Tabla de Fórmulas</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- PAGE 1 -->
+          <div class="page" style="z-index:8">
+            <div class="page-front tex-content">
+              <div class="page-number">1</div>
+              <h3>¿Qué es una Onda?</h3>
+              <p>Una <strong>onda</strong> es una perturbación que se propaga a través de un medio o del vacío, transportando energía sin transportar materia. Las partículas del medio oscilan alrededor de su posición de equilibrio.</p>
+              <div style="text-align:center; margin:10px 0;">
+                <img src="imagenes/onda_mecanica.jpeg" alt="Representación de Onda" style="width:100%; max-height:140px; object-fit:cover; border-radius:8px; border:1px solid var(--border-medium); box-shadow:0 0 15px var(--neon-blue-glow);">
+              </div>
+              <p><strong>Tipos de ondas según el medio:</strong></p>
+              <ul>
+                <li><strong>Ondas mecánicas:</strong> Requieren un medio material (sonido, cuerdas).</li>
+                <li><strong>Ondas electromagnéticas:</strong> No requieren medio (luz, radio).</li>
+              </ul>
+            </div>
+            <div class="page-back tex-content">
+              <div class="page-number">2</div>
+              <h3>Clasificación de Ondas</h3>
+              <p><strong>Según la dirección de vibración:</strong></p>
+              <ul>
+                <li><strong>Transversales:</strong> La perturbación es perpendicular a la dirección de propagación. Ejemplo: ondas en una cuerda.</li>
+                <li><strong>Longitudinales:</strong> La perturbación es paralela a la dirección de propagación. Ejemplo: ondas sonoras.</li>
+              </ul>
+              <p><strong>Según su frente de onda:</strong></p>
+              <ul>
+                <li><strong>Planas:</strong> Frentes de onda paralelos.</li>
+                <li><strong>Esféricas:</strong> Frentes de onda concéntricos desde un punto.</li>
+                <li><strong>Cilíndricas:</strong> Frentes de onda cilíndricos.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- PAGE 2 -->
+          <div class="page" style="z-index:7">
+            <div class="page-front tex-content">
+              <div class="page-number">3</div>
+              <h3>Ecuación de Onda General</h3>
+              <p>La función de onda armónica viajera que se propaga en la dirección $+x$ es:</p>
+              <div style="text-align:center; margin:10px 0;">
+                <img src="imagenes/video_movimiento_ondulatorio.png" alt="Ondas" style="width:100%; max-height:140px; object-fit:cover; border-radius:8px; border:1px solid var(--border-medium); box-shadow:0 0 15px var(--neon-blue-glow);">
+              </div>
+              <div class="math-block boxed-eq">\[ y(x,t) = A\sin(kx - \omega t + \phi_0) \]</div>
+              <p>Donde:</p>
+              <ul>
+                <li><strong>$A$</strong>: Amplitud (m) — máximo desplazamiento.</li>
+                <li><strong>$k = \frac{2\pi}{\lambda}$</strong>: Número de onda (rad/m).</li>
+                <li><strong>$\omega = 2\pi f$</strong>: Frecuencia angular (rad/s).</li>
+                <li><strong>$\phi_0$</strong>: Fase inicial (rad).</li>
+              </ul>
+              <p>La ecuación diferencial de onda es:</p>
+              <div class="math-block boxed-eq">\[ \frac{\partial^2 y}{\partial x^2} = \frac{1}{v^2}\frac{\partial^2 y}{\partial t^2} \]</div>
+            </div>
+            <div class="page-back tex-content">
+              <div class="page-number">4</div>
+              <h3>Parámetros de una Onda</h3>
+              <ul>
+                <li><strong>Longitud de onda $\lambda$</strong>: Distancia entre dos puntos consecutivos en fase (m).</li>
+                <li><strong>Periodo $T$</strong>: Tiempo para completar un ciclo (s). $T = \frac{1}{f}$</li>
+                <li><strong>Frecuencia $f$</strong>: Ciclos por segundo (Hz). $f = \frac{1}{T}$</li>
+                <li><strong>Velocidad de fase</strong>: $v = \lambda f = \frac{\omega}{k}$</li>
+                <li><strong>Número de onda</strong>: $k = \frac{2\pi}{\lambda}$</li>
+              </ul>
+              <div class="math-block boxed-eq">\[ v = \lambda f = \frac{\omega}{k} \]</div>
+              <p><strong>Nota:</strong> La velocidad de propagación depende del medio, no de la amplitud ni la frecuencia.</p>
+            </div>
+          </div>
+
+          <!-- PAGE 3 -->
+          <div class="page" style="z-index:6">
+            <div class="page-front tex-content">
+              <div class="page-number">5</div>
+              <h3>Velocidad de Propagación</h3>
+              <p>La velocidad de una onda depende de las propiedades del medio:</p>
+              <p><strong>Ondas en cuerdas:</strong></p>
+              <div class="math-block boxed-eq">\[ v = \sqrt{\frac{T}{\mu}} \]</div>
+              <p>Donde $T$ es la tensión (N) y $\mu$ es la densidad lineal de masa (kg/m).</p>
+              <p><strong>Ondas sonoras en un gas:</strong></p>
+              <div class="math-block">\[ v = \sqrt{\frac{\gamma R T_{\text{abs}}}{M}} \]</div>
+              <p>Donde $\gamma$ es el coeficiente adiabático, $R$ la constante de los gases, $T_{\text{abs}}$ la temperatura absoluta y $M$ la masa molar.</p>
+            </div>
+            <div class="page-back tex-content">
+              <div class="page-number">6</div>
+              <h3>Energía Transportada por Ondas</h3>
+              <p>La potencia media transportada por una onda armónica en una cuerda es:</p>
+              <div class="math-block boxed-eq">\[ P = \frac{1}{2}\mu \omega^2 A^2 v \]</div>
+              <p>La <strong>intensidad</strong> es la potencia por unidad de área:</p>
+              <div class="math-block">\[ I = \frac{P}{4\pi r^2} \]</div>
+              <p>Para ondas esféricas, la intensidad disminuye con el cuadrado de la distancia. La energía cinética y potencial de un elemento de onda se intercambian continuamente, pero la energía total se propaga a la velocidad $v$.</p>
+            </div>
+          </div>
+
+          <!-- PAGE 4 -->
+          <div class="page" style="z-index:5">
+            <div class="page-front tex-content">
+              <div class="page-number">7</div>
+              <h3>Ondas en Cuerdas</h3>
+              <p>Una cuerda tensa de densidad lineal $\mu$ y tensión $T$ soporta ondas transversales:</p>
+              <div style="text-align:center; margin:10px 0;">
+                <img src="imagenes/video_ondas_estacionarias.png" alt="Ondas en cuerdas" style="width:100%; max-height:140px; object-fit:cover; border-radius:8px; border:1px solid var(--border-medium); box-shadow:0 0 15px var(--neon-blue-glow);">
+              </div>
+              <ul>
+                <li>Velocidad: $v = \sqrt{T/\mu}$</li>
+                <li>La forma de la onda depende de la excitación inicial</li>
+                <li>En los extremos fijos se produce reflexión con inversión de fase</li>
+                <li>En los extremos libres se produce reflexión sin inversión</li>
+              </ul>
+              <p><strong>Principio de superposición:</strong> Cuando dos ondas se encuentran, el desplazamiento resultante es la suma algebraica:</p>
+              <div class="math-block boxed-eq">\[ y_R = y_1 + y_2 \]</div>
+            </div>
+            <div class="page-back tex-content">
+              <div class="page-number">8</div>
+              <h3>Ondas Sonoras</h3>
+              <p>El sonido es una onda mecánica longitudinal que se propaga por compresiones y rarefacciones del medio.</p>
+              <div style="text-align:center; margin:10px 0;">
+                <img src="imagenes/video_interferencia_ondas.png" alt="Ondas Sonoras e Interferencia" style="width:100%; max-height:140px; object-fit:cover; border-radius:8px; border:1px solid var(--border-medium); box-shadow:0 0 15px var(--neon-blue-glow);">
+              </div>
+              <ul>
+                <li><strong>Velocidad en aire (20°C):</strong> $v \approx 343$ m/s</li>
+                <li><strong>Velocidad en agua:</strong> $v \approx 1480$ m/s</li>
+                <li><strong>Velocidad en acero:</strong> $v \approx 5100$ m/s</li>
+              </ul>
+              <p><strong>Nivel de intensidad sonora (decibelios):</strong></p>
+              <div class="math-block">\[ \beta = 10 \log\left(\frac{I}{I_0}\right) \text{ dB} \]</div>
+              <p>Donde $I_0 = 10^{-12}$ W/m² es el umbral de audición.</p>
+            </div>
+          </div>
+
+          <!-- PAGE 5: FORMULA TABLE -->
+          <div class="page" style="z-index:4">
+            <div class="page-front tex-content">
+              <div class="page-number">9</div>
+              <h3 style="color:var(--neon-green)">📋 Tabla de Fórmulas — Ondas</h3>
+              <table class="formula-table">
+                <tr><th>Magnitud</th><th>Fórmula</th></tr>
+                <tr><td>Función de onda</td><td>$y = A\sin(kx - \omega t + \phi_0)$</td></tr>
+                <tr><td>Velocidad</td><td>$v = \lambda f = \omega/k$</td></tr>
+                <tr><td>Número de onda</td><td>$k = 2\pi/\lambda$</td></tr>
+                <tr><td>Frec. angular</td><td>$\omega = 2\pi f = 2\pi/T$</td></tr>
+                <tr><td>V. en cuerda</td><td>$v = \sqrt{T/\mu}$</td></tr>
+                <tr><td>Potencia</td><td>$P = \frac{1}{2}\mu\omega^2 A^2 v$</td></tr>
+                <tr><td>Intensidad</td><td>$I = P/(4\pi r^2)$</td></tr>
+                <tr><td>Decibelios</td><td>$\beta = 10\log(I/I_0)$</td></tr>
+                <tr><td>Ec. diferencial</td><td>$\frac{\partial^2 y}{\partial x^2} = \frac{1}{v^2}\frac{\partial^2 y}{\partial t^2}$</td></tr>
+              </table>
+            </div>
+            <div class="page-back tex-content">
+              <div class="page-number">10</div>
+              <h3>Relaciones Importantes</h3>
+              <ul>
+                <li>$v_{max} = A\omega$ (velocidad máxima de partícula)</li>
+                <li>$a_{max} = A\omega^2$ (aceleración máxima)</li>
+                <li>$\lambda = vT$ (relación longitud de onda-periodo)</li>
+              </ul>
+              <div class="math-block boxed-eq">\[ v = \frac{\lambda}{T} = \lambda f \]</div>
+              <p style="text-align:center;margin-top:20px;color:var(--text-muted)"><em>— Fin del Cuaderno 1 —</em></p>
+            </div>
+          </div>
+
+        </div><!-- /.book -->
+
+        <!-- Floating Toolbar -->
+        <div class="book-toolbar">
+          <button class="tb-btn" onclick="BookCtrl.goToStart('nb1')" title="Portada"><i class="fas fa-home"></i></button>
+          <button class="tb-btn" onclick="BookCtrl.prev('nb1')" title="Anterior"><i class="fas fa-chevron-left"></i></button>
+          <span class="page-indicator" id="page-ind-nb1">Pág 1-2 / 10</span>
+          <button class="tb-btn" onclick="BookCtrl.next('nb1')" title="Siguiente"><i class="fas fa-chevron-right"></i></button>
+          <button class="tb-btn" onclick="BookCtrl.fullscreen('nb1')" title="Pantalla completa"><i class="fas fa-expand"></i></button>
+        </div>
+      </div>
+
+      <div class="notebook-footer">
+        <button class="btn btn-primary" onclick="appState.goHome()"><i class="fas fa-sign-out-alt"></i> Salir del Cuaderno</button>
+      </div>
+    </div>
+    <!-- ── VIEW 5: HTML ANIMATIONS ── -->
+    <div id="view-iframe" class="view-panel">
+      <div class="notebook-header" style="flex-shrink:0;">
+        <button class="btn btn-back" onclick="appState.goHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <h2 id="iframe-title">Laboratorio</h2>
+      </div>
+      <div style="flex:1;position:relative;background:#000;">
+        <iframe id="fullscreen-iframe" src="" style="width:100%;height:100%;border:none;display:block;"></iframe>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══ AI CHATBOT ═══ -->
+  <!-- Floating Action Button -->
+  <div class="chat-fab" id="chatFab" onclick="ChatBot.toggle()">
+    <i class="fas fa-comments" style="font-size:1.6rem;color:#fff"></i>
+    <div class="chat-fab-badge"><i class="fas fa-comment-dots"></i></div>
+    <div class="chat-fab-bubble">¡Hola! Soy tu asistente de Física</div>
+  </div>
+
+  <!-- Chat Window (Draggable) -->
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header" id="chatDragHandle">
+      <div class="chat-header-left">
+        <div id="chatAvatar" style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid var(--neon-blue);flex-shrink:0"><img src="imagenes/ai_assistant.png" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+        <div>
+          <div class="chat-name" id="chatName">Asistente IA</div>
+          <div class="chat-status"><span class="status-dot"></span> En línea</div>
+        </div>
+      </div>
+      <div class="chat-header-right">
+        <button class="chat-btn" onclick="ChatBot.showSettings()" title="Configurar API Key"><i class="fas fa-key"></i></button>
+        <button class="chat-btn" onclick="ChatBot.showSelector()" title="Cambiar científico"><i class="fas fa-users"></i></button>
+        <button class="chat-btn" onclick="ChatBot.toggle()" title="Cerrar"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg bot">
+        <div class="msg-bubble">¡Bienvenido! Selecciona un científico para iniciar la conversación. Haz clic en el ícono <i class="fas fa-users"></i> de arriba.</div>
+      </div>
+    </div>
+    <div class="chat-quick-actions" id="chatQuickActions">
+      <button class="chat-action-btn" onclick="ChatBot.quickAction('openNotebook',1)"><i class="fas fa-book"></i> Cuaderno 1</button>
+      <button class="chat-action-btn" onclick="ChatBot.quickAction('goHome')"><i class="fas fa-home"></i> Inicio</button>
+    </div>
+    <div class="chat-input-area">
+      <button class="chat-media-btn" onclick="ChatBot.openCameraModal()" title="Cámara / Subir imagen"><i class="fas fa-camera"></i></button>
+      <button class="chat-media-btn" id="micBtn" onclick="ChatBot.toggleMic()" title="Micrófono"><i class="fas fa-microphone"></i></button>
+      <div id="imagePreviewArea" style="display:none;position:relative;width:50px;height:50px;margin-right:4px">
+        <img id="attachedImagePreview" style="width:50px;height:50px;object-fit:cover;border-radius:6px;border:2px solid var(--accent)" />
+        <button onclick="ChatBot.removeAttachedImage()" style="position:absolute;top:-6px;right:-6px;background:var(--accent);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">&times;</button>
+      </div>
+      <input type="text" class="chat-input" id="chatInput" placeholder="Escribe tu pregunta de física..." onkeydown="if(event.key==='Enter')ChatBot.send()">
+      <button class="chat-send-btn" onclick="ChatBot.send()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- Scientist Selector Modal -->
+  <div class="scientist-overlay" id="scientistOverlay">
+    <div class="scientist-modal">
+      <h2><i class="fas fa-user-astronaut"></i> Elige tu mentor científico</h2>
+      <p style="color:var(--text-muted);margin-bottom:24px">Cada científico tiene su propia personalidad y área de especialidad.</p>
+      <div class="scientist-grid">
+        <div class="scientist-card" onclick="ChatBot.selectScientist('newton')" style="--sci-color:#00f3ff">
+          <div class="sci-portrait-container">
+            <div class="sci-ring"></div>
+            <img src="imagenes/isaac newton.png" class="sci-img" alt="Newton">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" class="sci-corner-icon" alt="icon" style="filter:invert(1)">
+          </div>
+          <h3>Isaac Newton</h3>
+          <p>Mecánica y Gravitación</p>
+        </div>
+        <div class="scientist-card" onclick="ChatBot.selectScientist('hertz')" style="--sci-color:#39ff14">
+          <div class="sci-portrait-container">
+            <div class="sci-ring"></div>
+            <img src="imagenes/Heinrich Hertz.png" class="sci-img" alt="Hertz">
+            <i class="fas fa-bolt sci-corner-icon" style="color:#fff;font-size:1.2rem;display:flex;align-items:center;justify-content:center"></i>
+          </div>
+          <h3>Heinrich Hertz</h3>
+          <p>Ondas y Electromagnetismo</p>
+        </div>
+        <div class="scientist-card" onclick="ChatBot.selectScientist('einstein')" style="--sci-color:#ab80ff">
+          <div class="sci-portrait-container">
+            <div class="sci-ring"></div>
+            <img src="imagenes/Albert Einstein.png" class="sci-img" alt="Einstein">
+            <i class="fas fa-atom sci-corner-icon" style="color:#fff;font-size:1.2rem;display:flex;align-items:center;justify-content:center"></i>
+          </div>
+          <h3>Albert Einstein</h3>
+          <p>Relatividad y Física Moderna</p>
+        </div>
+        <div class="scientist-card" onclick="ChatBot.selectScientist('curie')" style="--sci-color:#ff6b9d">
+          <div class="sci-portrait-container">
+            <div class="sci-ring"></div>
+            <img src="imagenes/Marie Curie.png" class="sci-img" alt="Curie">
+            <i class="fas fa-radiation sci-corner-icon" style="color:#fff;font-size:1.2rem;display:flex;align-items:center;justify-content:center"></i>
+          </div>
+          <h3>Marie Curie</h3>
+          <p>Radioactividad y Energía</p>
+        </div>
+      </div>
+      <button class="btn" style="margin-top:16px;width:100%;background:transparent;color:var(--text-muted);border-color:var(--border-medium)" onclick="ChatBot.hideSelector()"><i class="fas fa-times"></i> Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Cinematic Intro Overlay -->
+  <div class="cinematic-overlay" id="cinematicOverlay">
+    <div class="cinematic-content" id="cinematicContent">
+      <div class="cinematic-icon" id="cinematicIcon"></div>
+      <h1 id="cinematicName"></h1>
+      <p id="cinematicQuote"></p>
+    </div>
+  </div>
+
+  <!-- API Key Settings Modal -->
+  <div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-modal">
+      <h3><i class="fas fa-key" style="color:var(--neon-blue)"></i> Configurar API Key</h3>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">Ingresa tu API Key de OpenAI o Gemini para activar las respuestas del asistente. Se guarda localmente en tu navegador.</p>
+      <select id="apiProvider" style="width:100%;padding:10px;margin-bottom:10px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-medium);border-radius:var(--radius-sm);font-family:var(--font)">
+        <option value="openai">OpenAI (ChatGPT)</option>
+        <option value="gemini" selected>Google Gemini</option>
+      </select>
+      <select id="apiModel" style="width:100%;padding:10px;margin-bottom:10px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-medium);border-radius:var(--radius-sm);font-family:var(--font)">
+        <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recomendado)</option>
+        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Respaldo)</option>
+        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+      </select>
+      <input type="password" id="apiKeyInput" placeholder="sk-... o AIza..." style="width:100%;padding:10px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border-medium);border-radius:var(--radius-sm);font-family:var(--mono);font-size:0.8rem;margin-bottom:16px">
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" style="flex:1" onclick="ChatBot.saveApiKey()"><i class="fas fa-save"></i> Guardar</button>
+        <button class="btn" style="flex:1;background:transparent;color:var(--text-muted);border-color:var(--border-medium)" onclick="ChatBot.hideSettings()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=2026"></script>
+  <script>
+    // Configuración inicial del chatbot
+    const providerSelect = document.getElementById('apiProvider');
+    if (providerSelect) {
+      providerSelect.addEventListener('change', (e) => {
+        const input = document.getElementById('apiKeyInput');
+        if (e.target.value === 'gemini') {
+            input.placeholder = "AIza... o gen-lang-client-...";
+        } else {
+            input.placeholder = "sk-...";
+        }
+      });
+    }
+  </script>
+
+  <!-- Camera Modal -->
+  <div id="cameraModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:100000;display:none;justify-content:center;align-items:center">
+    <div style="background:var(--bg-secondary);border-radius:16px;padding:24px;max-width:480px;width:90%;text-align:center">
+      <h3 style="color:var(--text-primary);margin-bottom:16px"><i class="fas fa-camera"></i> Capturar / Subir Imagen</h3>
+      <video id="cameraStream" style="width:100%;border-radius:8px;margin-bottom:12px;display:none" autoplay playsinline></video>
+      <canvas id="cameraCanvas" style="display:none"></canvas>
+      <img id="cameraPreview" style="width:100%;border-radius:8px;margin-bottom:12px;display:none" />
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" id="btnStartCam" onclick="ChatBot.startCamera()"><i class="fas fa-video"></i> Tomar Foto</button>
+        <button class="btn btn-primary" id="btnCapture" onclick="ChatBot.capturePhoto()" style="display:none"><i class="fas fa-camera"></i> Capturar</button>
+        <label class="btn btn-primary" style="cursor:pointer"><i class="fas fa-upload"></i> Subir Imagen<input type="file" id="imageUpload" accept="image/*" onchange="ChatBot.handleImageUpload(event)" style="display:none"></label>
+        <button class="btn btn-primary" id="btnUseImage" onclick="ChatBot.useImage()" style="display:none;background:var(--neon-green);color:#000"><i class="fas fa-check"></i> Usar imagen</button>
+      </div>
+      <button onclick="ChatBot.closeCameraModal()" style="margin-top:12px;background:transparent;border:1px solid var(--border-medium);color:var(--text-muted);padding:8px 20px;border-radius:8px;cursor:pointer">Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('physics_theme', t);
+  }
+  // Hover preview
+  document.querySelectorAll('#themeSelectorSidebar button').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      btn.style.transform = 'scale(1.2)';
+      document.documentElement.setAttribute('data-theme', btn.title.toLowerCase());
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'scale(1)';
+      document.documentElement.setAttribute('data-theme', localStorage.getItem('physics_theme') || 'dark');
+    });
+  });
+
+  // QR Code Generation
+  document.addEventListener('DOMContentLoaded', () => {
+    const qrOpts = {width:80, height:80, colorDark:'#00f3ff', colorLight:'#0E0E10', correctLevel:QRCode.CorrectLevel.M};
+    if(document.getElementById('qr-video1')) new QRCode('qr-video1', {...qrOpts, text:'https://youtu.be/3b4Vv8zIwt4?si=y4RfqwaY0XDqKJTE'});
+    if(document.getElementById('qr-video2')) new QRCode('qr-video2', {...qrOpts, text:'https://youtu.be/Opcentm_0RE?si=mkPstKz9bJ4oEPrv'});
+    if(document.getElementById('qr-video3')) new QRCode('qr-video3', {...qrOpts, text:'https://youtu.be/PfL1mqi-uro?si=ZaRrYE_yeviXdsZ3'});
+  });
+  </script>
+</body>
+</html>

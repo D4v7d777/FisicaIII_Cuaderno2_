@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulación: Superposición de Ondas</title>
+  <style>
+    /* =========================================================
+       1. SISTEMA DE TEMAS (CSS CUSTOM PROPERTIES)
+       ========================================================= */
+    :root {
+      --bg-primary: #0E0E10;
+      --bg-secondary: #16161A;
+      --bg-tertiary: #1E1E24;
+      --text-primary: #F5F5F0;
+      --text-secondary: #A0A0B0;
+      --accent: #00E5FF;
+      --accent-secondary: #B100E8;
+      --accent-glow: rgba(0, 229, 255, 0.4);
+      --shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+      --border-color: rgba(0, 229, 255, 0.3);
+      --animation-speed: 2s;
+      --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+      
+      --onda-1: var(--accent);
+      --onda-2: var(--accent-secondary);
+      --onda-res: #FFFFFF;
+    }
+
+    :root[data-theme="light"] {
+      --bg-primary: #FAFAF8;
+      --bg-secondary: #F0F0EE;
+      --bg-tertiary: #E5E5E2;
+      --text-primary: #1A1A1A;
+      --text-secondary: #5C5C66;
+      --accent: #0B4A99;
+      --accent-secondary: #E63946;
+      --accent-glow: rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --border-color: rgba(0, 0, 0, 0.1);
+      --animation-speed: 4s;
+      
+      --onda-1: var(--accent);
+      --onda-2: var(--accent-secondary);
+      --onda-res: #333333;
+    }
+
+    :root[data-theme="dark"] {
+      --bg-primary: #0E0E10;
+      --bg-secondary: #1C1C22;
+      --bg-tertiary: #272730;
+      --text-primary: #F4F4F8;
+      --text-secondary: #8E8EA0;
+      --accent: #00E5FF;
+      --accent-secondary: #FF2A6D;
+      --accent-glow: rgba(0, 229, 255, 0.6);
+      --shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+      --border-color: rgba(0, 229, 255, 0.25);
+      --animation-speed: 1.5s;
+      
+      --onda-1: var(--accent);
+      --onda-2: var(--accent-secondary);
+      --onda-res: #FFFFFF;
+    }
+
+    :root[data-theme="forest"] {
+      --bg-primary: #1B2D1A;
+      --bg-secondary: #243B22;
+      --bg-tertiary: #314D2E;
+      --text-primary: #F5EDD6;
+      --text-secondary: #A8C09A;
+      --accent: #7FD44C;
+      --accent-secondary: #F9A03F;
+      --accent-glow: rgba(127, 212, 76, 0.2);
+      --shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      --border-color: rgba(127, 212, 76, 0.2);
+      --animation-speed: 5s;
+      
+      --onda-1: var(--accent);
+      --onda-2: var(--accent-secondary);
+      --onda-res: #FFFFFF;
+    }
+
+    :root[data-theme="sunset"] {
+      --bg-primary: linear-gradient(135deg, #FF6B35 0%, #F7C59F 50%, #6B2D8B 100%);
+      --bg-secondary: rgba(25, 10, 30, 0.5);
+      --bg-tertiary: rgba(0, 0, 0, 0.3);
+      --text-primary: #FFF0D6;
+      --text-secondary: #FFB380;
+      --accent: #FFF;
+      --accent-secondary: #FFD166;
+      --accent-glow: rgba(255, 255, 255, 0.5);
+      --shadow: 0 10px 25px rgba(107, 45, 139, 0.5);
+      --border-color: rgba(255, 255, 255, 0.15);
+      --animation-speed: 6s;
+      
+      --onda-1: #4AF626;
+      --onda-2: var(--accent-secondary);
+      --onda-res: #FFFFFF;
+    }
+
+    :root[data-theme="ocean"] {
+      --bg-primary: #0A1628;
+      --bg-secondary: #112B47;
+      --bg-tertiary: #19436A;
+      --text-primary: #E0F2FE;
+      --text-secondary: #7DD3FC;
+      --accent: #06B6D4;
+      --accent-secondary: #3B82F6;
+      --accent-glow: rgba(6, 182, 212, 0.4);
+      --shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+      --border-color: rgba(6, 182, 212, 0.3);
+      --animation-speed: 3.5s;
+      
+      --onda-1: var(--accent);
+      --onda-2: #F472B6; /* Pink para contraste en océano */
+      --onda-res: #FFFFFF;
+    }
+
+    :root[data-theme="neon"] {
+      --bg-primary: #000000;
+      --bg-secondary: #0A0A0A;
+      --bg-tertiary: #141414;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B3B3B3;
+      --accent: #FF00FF;
+      --accent-secondary: #39FF14;
+      --accent-glow: rgba(255, 0, 255, 0.8);
+      --shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 30px var(--accent);
+      --border-color: var(--accent);
+      --animation-speed: 0.8s;
+      
+      --onda-1: var(--accent);
+      --onda-2: var(--accent-secondary);
+      --onda-res: #FFFF00; /* Amarillo eléctrico resultante */
+    }
+
+    :root[data-theme="aurora"] {
+      --bg-primary: linear-gradient(-45deg, #020111, #20124d, #000022, #113333);
+      --bg-secondary: rgba(0, 0, 0, 0.4);
+      --bg-tertiary: rgba(0, 0, 0, 0.6);
+      --text-primary: #E8FFFB;
+      --text-secondary: #90E0D0;
+      --accent: #00FFAA;
+      --accent-secondary: #9D00FF;
+      --accent-glow: rgba(0, 255, 170, 0.6);
+      --shadow: 0 0 20px rgba(0, 255, 170, 0.3), inset 0 0 30px rgba(157, 0, 255, 0.1);
+      --border-color: rgba(0, 255, 170, 0.4);
+      --animation-speed: 8s;
+      
+      --onda-1: var(--accent);
+      --onda-2: var(--accent-secondary);
+      --onda-res: #FFFFFF;
+    }
+
+    /* =========================================================
+       2. ESTILOS GLOBALES E INTERFAZ
+       ========================================================= */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.8s ease, color 0.8s ease, box-shadow 0.8s ease, border-color 0.8s ease, text-shadow 0.8s ease;
+    }
+    body {
+      background: var(--bg-primary);
+      background-size: 400% 400%;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    :root[data-theme="sunset"] body, :root[data-theme="aurora"] body { animation: gradientShift var(--animation-speed) ease infinite; }
+
+    header { text-align: center; margin-bottom: 20px; z-index: 10; }
+    h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+    h2 { font-size: 1.1rem; font-weight: 400; color: var(--text-secondary); }
+
+    .app-container {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .glass-panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all 0.8s ease;
+      position: relative;
+    }
+    :root[data-theme="forest"] .glass-panel { backdrop-filter: blur(4px); }
+    :root[data-theme="ocean"] .glass-panel { backdrop-filter: blur(25px); border-radius: 30px;}
+    :root[data-theme="neon"] h1 { text-shadow: 0 0 5px var(--accent-secondary), 0 0 10px var(--accent-secondary); animation: flicker var(--animation-speed) infinite alternate; }
+    :root[data-theme="neon"] .glass-panel { box-shadow: 0 0 15px var(--accent), inset 0 0 10px var(--accent); border: 2px solid var(--accent); border-radius: 0; }
+    @keyframes flicker { 0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; } 20%, 24%, 55% { opacity: 0.5; } }
+
+    /* Canvas Cartesiano Estilizado */
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      background: var(--bg-primary);
+      border-radius: 15px;
+      overflow: hidden;
+      border: 2px solid var(--border-color);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+    }
+    :root[data-theme="neon"] .canvas-wrapper { border-radius: 0; border: 2px solid var(--accent); }
+    :root[data-theme="light"] .canvas-wrapper { background: #FFFFFF; }
+    
+    canvas { display: block; width: 100%; height: 100%; }
+
+    .scanlines {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+      background-size: 100% 4px; pointer-events: none; opacity: 0; transition: opacity 0.5s ease;
+    }
+    :root[data-theme="neon"] .scanlines { opacity: 1; }
+
+    /* Toggles Superiores */
+    .toggles-bar {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      user-select: none;
+    }
+    .toggle-item input { display: none; }
+    .toggle-box {
+      width: 24px;
+      height: 24px;
+      border: 2px solid;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    :root[data-theme="neon"] .toggle-box { border-radius: 0; }
+    .toggle-item input:checked + .toggle-box::after {
+      content: '✔';
+      color: inherit;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    #toggle-c-1 { border-color: var(--onda-1); color: var(--onda-1); }
+    #toggle-c-2 { border-color: var(--onda-2); color: var(--onda-2); }
+    #toggle-c-r { border-color: var(--onda-res); color: var(--onda-res); }
+
+    .toggle-item input:checked + #toggle-c-1 { background: rgba(255,255,255,0.1); box-shadow: 0 0 10px var(--onda-1); }
+    .toggle-item input:checked + #toggle-c-2 { background: rgba(255,255,255,0.1); box-shadow: 0 0 10px var(--onda-2); }
+    .toggle-item input:checked + #toggle-c-r { background: rgba(255,255,255,0.1); box-shadow: 0 0 10px var(--onda-res); }
+
+    /* Panel de Controles Dividido (Onda 1 y Onda 2) */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 800px) { .controls-grid { grid-template-columns: 1fr; } }
+    
+    .wave-panel {
+      background: var(--bg-tertiary);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 6px solid;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    :root[data-theme="neon"] .wave-panel { border-radius: 0; }
+    #panel-1 { border-left-color: var(--onda-1); }
+    #panel-2 { border-left-color: var(--onda-2); }
+
+    .panel-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 5px;
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+    }
+    #panel-1 .panel-title { color: var(--onda-1); }
+    #panel-2 .panel-title { color: var(--onda-2); }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 60px 1fr 70px;
+      align-items: center;
+      gap: 10px;
+    }
+    .slider-param {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-secondary);
+    }
+    
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: var(--bg-primary); border-radius: 3px; border: 1px solid var(--border-color); box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); }
+    input[type=range]::-webkit-slider-thumb {
+      box-shadow: var(--shadow); border: 2px solid var(--bg-primary); height: 20px; width: 20px; border-radius: 50%; cursor: pointer; -webkit-appearance: none; margin-top: -8px; transition: transform 0.1s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    :root[data-theme="neon"] input[type=range]::-webkit-slider-thumb { border-radius: 0; border: 1px solid var(--text-primary); }
+    :root[data-theme="neon"] input[type=range]::-webkit-slider-runnable-track { border-radius: 0; }
+
+    #panel-1 input[type=range]::-webkit-slider-thumb { background: var(--onda-1); }
+    #panel-2 input[type=range]::-webkit-slider-thumb { background: var(--onda-2); }
+
+    .slider-val {
+      background: var(--bg-primary);
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      text-align: center;
+      font-family: monospace;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+    :root[data-theme="neon"] .slider-val { border-radius: 0; }
+
+    /* Dirección y Data */
+    .wave-data {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-color);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .dir-toggle {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    :root[data-theme="neon"] .dir-toggle { border-radius: 0; }
+
+    /* Theme Selector UI Flotante */
+    .theme-selector-container { position: fixed; bottom: 30px; right: 30px; z-index: 100; display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
+    .theme-selector-toggle { width: 56px; height: 56px; border-radius: 50%; background: var(--bg-secondary); border: 2px solid var(--accent); color: var(--accent); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: var(--shadow); font-size: 1.5rem; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    :root[data-theme="neon"] .theme-selector-toggle { border-radius: 0; background: #000; }
+    .theme-selector-toggle:hover { transform: scale(1.1) rotate(15deg); background: var(--accent); color: var(--bg-primary); }
+    .theme-list { display: flex; flex-direction: column-reverse; gap: 10px; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.9); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: var(--bg-secondary); padding: 12px; border-radius: 30px; border: 1px solid var(--border-color); box-shadow: var(--shadow); }
+    :root[data-theme="neon"] .theme-list { border-radius: 0; }
+    .theme-selector-container:hover .theme-list, .theme-list.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+    .theme-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--bg-primary); cursor: pointer; position: relative; transition: transform 0.2s; }
+    :root[data-theme="neon"] .theme-btn { border-radius: 0; }
+    .theme-btn:hover { transform: scale(1.2); }
+    .theme-btn.active-theme::after { content: ''; position: absolute; top: -4px; right: -4px; bottom: -4px; left: -4px; border: 2px solid var(--accent); border-radius: 50%; }
+    :root[data-theme="neon"] .theme-btn.active-theme::after { border-radius: 0; }
+    .theme-btn::before { content: attr(data-name); position: absolute; right: 55px; top: 50%; transform: translateY(-50%); background: var(--bg-primary); color: var(--text-primary); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .theme-btn:hover::before { opacity: 1; }
+    .btn-light { background: #FAFAF8; } .btn-dark { background: #0E0E10; } .btn-forest { background: #1B2D1A; } .btn-sunset { background: linear-gradient(135deg, #FF6B35, #6B2D8B); } .btn-ocean { background: #0A1628; } .btn-neon { background: #000; border-color: #FF00FF !important; } .btn-aurora { background: linear-gradient(-45deg, #20124d, #113333); }
+
+    /* Footer / FPS */
+    .footer-panel {
+      display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-top: -10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Theme Selector -->
+  <div class="theme-selector-container" id="themeContainer">
+    <div class="theme-list" id="themeList">
+      <button class="theme-btn btn-aurora" data-theme-val="aurora" data-name="Aurora"></button>
+      <button class="theme-btn btn-neon" data-theme-val="neon" data-name="Neon"></button>
+      <button class="theme-btn btn-ocean" data-theme-val="ocean" data-name="Ocean"></button>
+      <button class="theme-btn btn-sunset" data-theme-val="sunset" data-name="Sunset"></button>
+      <button class="theme-btn btn-forest" data-theme-val="forest" data-name="Forest"></button>
+      <button class="theme-btn btn-dark" data-theme-val="dark" data-name="Dark"></button>
+      <button class="theme-btn btn-light" data-theme-val="light" data-name="Light"></button>
+    </div>
+    <div class="theme-selector-toggle" id="themeToggle">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        <circle cx="12" cy="12" r="5"/>
+      </svg>
+    </div>
+  </div>
+
+  <header>
+    <h1>Superposición de Ondas (Interferencia)</h1>
+    <h2>Interacción entre dos ondas armónicas viajeras en el mismo medio</h2>
+  </header>
+
+  <div class="app-container">
+    
+    <!-- Toggles Visibilidad -->
+    <div class="glass-panel toggles-bar">
+      <label class="toggle-item">
+        <input type="checkbox" id="chk-w1" checked>
+        <div class="toggle-box" id="toggle-c-1"></div>
+        Onda 1
+      </label>
+      <label class="toggle-item">
+        <input type="checkbox" id="chk-w2" checked>
+        <div class="toggle-box" id="toggle-c-2"></div>
+        Onda 2
+      </label>
+      <label class="toggle-item">
+        <input type="checkbox" id="chk-wr" checked>
+        <div class="toggle-box" id="toggle-c-r"></div>
+        Onda Resultante (Superposición)
+      </label>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrapper">
+      <div class="scanlines"></div>
+      <canvas id="waveCanvas"></canvas>
+    </div>
+
+    <!-- Controles Divididos -->
+    <div class="controls-grid">
+      <!-- ONDA 1 -->
+      <div class="wave-panel" id="panel-1">
+        <div class="panel-title">Onda 1 ($y_1$)</div>
+        
+        <div class="slider-row">
+          <span class="slider-param">A₁</span>
+          <input type="range" id="w1-a" min="10" max="250" value="80">
+          <span class="slider-val" id="v1-a">80 px</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-param">k₁</span>
+          <input type="range" id="w1-k" min="10" max="150" value="30">
+          <span class="slider-val" id="v1-k">0.03</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-param">&omega;₁</span>
+          <input type="range" id="w1-w" min="1" max="100" value="15">
+          <span class="slider-val" id="v1-w">1.5</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-param">&phi;₁</span>
+          <input type="range" id="w1-p" min="0" max="628" value="0">
+          <span class="slider-val" id="v1-p">0.0</span>
+        </div>
+
+        <div class="wave-data">
+          <div><span id="d1-lam">&lambda;₁ = 209.4 px</span> &nbsp;|&nbsp; <span id="d1-vel">v₁ = 50.0 px/s</span></div>
+          <button class="dir-toggle" id="btn-dir1" data-val="-1">Viaja a Derecha (+x)</button>
+        </div>
+      </div>
+
+      <!-- ONDA 2 -->
+      <div class="wave-panel" id="panel-2">
+        <div class="panel-title">Onda 2 ($y_2$)</div>
+        
+        <div class="slider-row">
+          <span class="slider-param">A₂</span>
+          <input type="range" id="w2-a" min="10" max="250" value="50">
+          <span class="slider-val" id="v2-a">50 px</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-param">k₂</span>
+          <input type="range" id="w2-k" min="10" max="150" value="60">
+          <span class="slider-val" id="v2-k">0.06</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-param">&omega;₂</span>
+          <input type="range" id="w2-w" min="1" max="100" value="30">
+          <span class="slider-val" id="v2-w">3.0</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-param">&phi;₂</span>
+          <input type="range" id="w2-p" min="0" max="628" value="0">
+          <span class="slider-val" id="v2-p">0.0</span>
+        </div>
+
+        <div class="wave-data">
+          <div><span id="d2-lam">&lambda;₂ = 104.7 px</span> &nbsp;|&nbsp; <span id="d2-vel">v₂ = 50.0 px/s</span></div>
+          <button class="dir-toggle" id="btn-dir2" data-val="1">Viaja a Izquierda (-x)</button>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <script>
+    /* =========================================================
+       1. MANEJO DE TEMAS (CSS Custom Properties)
+       ========================================================= */
+    const rootEl = document.documentElement;
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    let currentTheme = localStorage.getItem('app-theme') || 'dark';
+
+    function applyTheme(themeName) {
+      if(!themeName) return;
+      rootEl.setAttribute('data-theme', themeName);
+      themeBtns.forEach(btn => btn.classList.toggle('active-theme', btn.dataset.themeVal === themeName));
+    }
+
+    applyTheme(currentTheme);
+    themeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const theme = e.target.dataset.themeVal;
+        currentTheme = theme;
+        localStorage.setItem('app-theme', theme);
+        applyTheme(theme);
+      });
+      btn.addEventListener('mouseenter', (e) => rootEl.setAttribute('data-theme', e.target.dataset.themeVal));
+      btn.addEventListener('mouseleave', () => applyTheme(currentTheme));
+    });
+    document.getElementById('themeToggle').addEventListener('click', () => document.getElementById('themeList').classList.toggle('active'));
+
+    /* =========================================================
+       2. MOTOR SIMULADOR CARTESIANO DE SUPERPOSICIÓN
+       ========================================================= */
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Estado Físico
+    let W1 = { A: 80, k: 0.03, w: 1.5, p: 0, sign: -1, visible: true };
+    let W2 = { A: 50, k: 0.06, w: 3.0, p: 0, sign: 1, visible: true };
+    let WR = { visible: true };
+    let globalT = 0;
+
+    // Configuración UI
+    const q = (id) => document.getElementById(id);
+    
+    // Toggles
+    q('chk-w1').addEventListener('change', e => W1.visible = e.target.checked);
+    q('chk-w2').addEventListener('change', e => W2.visible = e.target.checked);
+    q('chk-wr').addEventListener('change', e => WR.visible = e.target.checked);
+
+    // Dirs
+    q('btn-dir1').addEventListener('click', function() {
+      W1.sign = W1.sign * -1;
+      this.textContent = W1.sign === -1 ? 'Viaja a Derecha (+x)' : 'Viaja a Izquierda (-x)';
+    });
+    q('btn-dir2').addEventListener('click', function() {
+      W2.sign = W2.sign * -1;
+      this.textContent = W2.sign === -1 ? 'Viaja a Derecha (+x)' : 'Viaja a Izquierda (-x)';
+    });
+
+    // Actualización derivada
+    function updateState() {
+      W1.A = parseInt(q('w1-a').value);
+      W1.k = parseInt(q('w1-k').value) / 1000;
+      W1.w = parseInt(q('w1-w').value) / 10;
+      W1.p = parseInt(q('w1-p').value) / 100;
+      
+      q('v1-a').textContent = `${W1.A} px`;
+      q('v1-k').textContent = `${W1.k.toFixed(3)}`;
+      q('v1-w').textContent = `${W1.w.toFixed(1)}`;
+      q('v1-p').textContent = `${W1.p.toFixed(2)}`;
+      
+      let lam1 = (2*Math.PI)/W1.k;
+      let v1 = W1.w/W1.k;
+      q('d1-lam').innerHTML = `&lambda;₁ = ${lam1.toFixed(1)} px`;
+      q('d1-vel').innerHTML = `v₁ = ${v1.toFixed(1)} px/s`;
+
+      W2.A = parseInt(q('w2-a').value);
+      W2.k = parseInt(q('w2-k').value) / 1000;
+      W2.w = parseInt(q('w2-w').value) / 10;
+      W2.p = parseInt(q('w2-p').value) / 100;
+
+      q('v2-a').textContent = `${W2.A} px`;
+      q('v2-k').textContent = `${W2.k.toFixed(3)}`;
+      q('v2-w').textContent = `${W2.w.toFixed(1)}`;
+      q('v2-p').textContent = `${W2.p.toFixed(2)}`;
+      
+      let lam2 = (2*Math.PI)/W2.k;
+      let v2 = W2.w/W2.k;
+      q('d2-lam').innerHTML = `&lambda;₂ = ${lam2.toFixed(1)} px`;
+      q('d2-vel').innerHTML = `v₂ = ${v2.toFixed(1)} px/s`;
+    }
+
+    ['w1-a','w1-k','w1-w','w1-p','w2-a','w2-k','w2-w','w2-p'].forEach(id => {
+      q(id).addEventListener('input', updateState);
+    });
+    updateState();
+
+    // Resize HDPI
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Obtener Colores CSS
+    function getThemeColors() {
+      const s = getComputedStyle(document.body);
+      return {
+        bg: s.getPropertyValue('--bg-primary').trim(),
+        textSec: s.getPropertyValue('--text-secondary').trim(),
+        text: s.getPropertyValue('--text-primary').trim(),
+        onda1: s.getPropertyValue('--onda-1').trim(),
+        onda2: s.getPropertyValue('--onda-2').trim(),
+        ondaRes: s.getPropertyValue('--onda-res').trim()
+      };
+    }
+
+    function render() {
+      const w = parseInt(canvas.style.width);
+      const h = parseInt(canvas.style.height);
+      const cx = w / 2;
+      const cy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+      const c = getThemeColors();
+
+      // 1. DIBUJAR MALLA
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = c.textSec;
+      ctx.globalAlpha = 0.15;
+      ctx.beginPath();
+      for(let x=0; x<=w; x+=50) { let oX = (cx%50)+(x-(cx%50)); ctx.moveTo(oX,0); ctx.lineTo(oX,h); }
+      for(let y=0; y<=h; y+=50) { let oY = (cy%50)+(y-(cy%50)); ctx.moveTo(0,oY); ctx.lineTo(w,oY); }
+      ctx.stroke();
+
+      // Ejes
+      ctx.globalAlpha = 0.8; ctx.strokeStyle = c.text;
+      ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(w, cy); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
+      
+      // Rotulos
+      ctx.fillStyle = c.textSec; ctx.font = "12px monospace"; ctx.globalAlpha = 0.6;
+      for(let i=-12; i<=12; i++) {
+        if(i===0) continue;
+        let pX = cx + i*50; let pY = cy - i*50;
+        if(pX>0 && pX<w) ctx.fillText(i*50, pX+5, cy+15);
+        if(pY>0 && pY<h) ctx.fillText(i*50, cx+5, pY-5);
+      }
+      ctx.globalAlpha = 1.0;
+
+      // 2. ACTUALIZAR TIEMPO
+      let realThemeSpeed = parseFloat(getComputedStyle(document.body).getPropertyValue('--animation-speed')) || 2;
+      let dt = (60 / realThemeSpeed) * 0.005 * 1.0;
+      globalT += dt;
+
+      // GLOW EN ONDAS INDIVIDUALES DEP DE TEMA
+      if(currentTheme === 'neon' || currentTheme === 'aurora' || currentTheme === 'dark') {
+          ctx.shadowBlur = 10;
+      } else { ctx.shadowBlur = 0; }
+
+      // 3. TRAZADO ONDA 1
+      if(W1.visible) {
+        ctx.beginPath();
+        ctx.strokeStyle = c.onda1;
+        ctx.shadowColor = c.onda1;
+        ctx.lineWidth = 2.5;
+        let first = true;
+        for(let px = 0; px <= w; px+=2) {
+          let xm = px - cx;
+          let ym = W1.A * Math.sin(W1.k * xm + W1.sign * W1.w * globalT + W1.p);
+          let py = cy - ym;
+          if(first) { ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+
+      // 4. TRAZADO ONDA 2
+      if(W2.visible) {
+        ctx.beginPath();
+        ctx.strokeStyle = c.onda2;
+        ctx.shadowColor = c.onda2;
+        ctx.lineWidth = 2.5;
+        let first = true;
+        for(let px = 0; px <= w; px+=2) {
+          let xm = px - cx;
+          let ym = W2.A * Math.sin(W2.k * xm + W2.sign * W2.w * globalT + W2.p);
+          let py = cy - ym;
+          if(first) { ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+
+      // 5. TRAZADO RESULTANTE
+      if(WR.visible) {
+        if(currentTheme === 'neon' || currentTheme === 'aurora' || currentTheme === 'ocean') { ctx.shadowBlur = 15; }
+        ctx.beginPath();
+        ctx.strokeStyle = c.ondaRes;
+        ctx.shadowColor = c.ondaRes;
+        ctx.lineWidth = 3.5;
+        let first = true;
+        for(let px = 0; px <= w; px+=2) {
+          let xm = px - cx;
+          let y1m = W1.A * Math.sin(W1.k * xm + W1.sign * W1.w * globalT + W1.p);
+          let y2m = W2.A * Math.sin(W2.k * xm + W2.sign * W2.w * globalT + W2.p);
+          let ym = y1m + y2m; // Principio de Superposición
+          let py = cy - ym;
+          if(first) { ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+
+      ctx.shadowBlur = 0;
+      requestAnimationFrame(render);
+    }
+    render();
+  </script>
+</body>
+</html>
