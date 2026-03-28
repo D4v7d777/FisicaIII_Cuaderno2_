@@ -216,7 +216,6 @@
   // Override openNotebook to also init book
   const origOpenNb = appState.openNotebook;
   appState.openNotebook = function(id) {
-    console.trace("[DEBUG] openNotebook called with id:", id);
     // Clean up iframe if previously open
     var iframe = document.getElementById('fullscreen-iframe');
     if (iframe) iframe.src = '';
@@ -228,23 +227,9 @@
     setTimeout(renderMath, 200);
   };
 
-  // Init spirals and event delegation
+  // Init spirals
   function initApp() {
     generateSpirals();
-
-    // Event delegation for animation cards
-    var animGrid = document.getElementById('animGrid');
-    if (animGrid) {
-      animGrid.addEventListener('click', function(e) {
-        // Find the closest .anim-card parent from the click target
-        var card = e.target.closest('.anim-card');
-        if (card && card.dataset.animSrc) {
-          e.preventDefault();
-          e.stopPropagation();
-          appState.openIframe(card.dataset.animSrc, card.dataset.animTitle);
-        }
-      });
-    }
   }
 
   if (document.readyState === 'loading') {
